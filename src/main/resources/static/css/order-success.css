@@ -1,0 +1,55 @@
+/* ====================================
+   ORDER SUCCESS PAGE STYLES
+   ==================================== */
+
+.success-alert {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: 1px solid #059669;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    color: white;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+}
+
+.success-alert-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.success-alert-icon {
+    font-size: 3rem;
+    animation: successPulse 1s ease-in-out;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.success-alert-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.success-alert-body {
+    padding-left: 4rem;
+}
+
+.success-alert-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.order-id-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-top: 1rem;
+}

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Painel Administrativo - E-commerce Baltazar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css">
+	<link rel="stylesheet" th:href="@{/css/admin.css}" href="/css/admin.css">
+	<link rel="stylesheet" th:href="@{/css/auth.css}" href="/css/auth.css">
+</head>
+
+<body>
+	<!-- Admin Header -->
+	<header class="admin-header">
+		<div class="admin-nav-container">
+			<div class="admin-logo">
+				<a href="index.html">
+					<h1><i class="fas fa-shopping-bag"></i> E-commerce</h1>
+				</a>
+				<span class="admin-badge">Admin</span>
+			</div>
+			<div class="admin-user-actions">
+				<button class="theme-toggle" id="theme-toggle" title="Alternar tema">
+					<i class="fas fa-sun"></i>
+				</button>
+				<div class="admin-user-info">
+					<i class="fas fa-user-shield"></i>
+					<span>João Silva</span>
+				</div>
+				<a href="index.html" class="btn btn-outline btn-small">
+					<i class="fas fa-arrow-left"></i> Voltar ao Site
+				</a>
+			</div>
+		</div>
+	</header>
+
+	<!-- Admin Layout -->
+	<div class="admin-layout">
+		<!-- Sidebar -->
+		<aside class="admin-sidebar">
+			<nav class="admin-nav">
+				<ul class="admin-nav-list">
+					<li class="admin-nav-item">
+						<a href="admin.html" class="admin-nav-link active" data-section="dashboard">
+							<i class="fas fa-tachometer-alt"></i>
+							<span>Dashboard</span>
+						</a>
+					</li>
+					<li class="admin-nav-item">
+						<a href="admin.html" class="admin-nav-link" data-section="product">
+							<i class="fas fa-box"></i>
+							<span>Produtos</span>
+						</a>
+					</li>
+					<li class="admin-nav-item">
+						<a href="admin.html" class="admin-nav-link" data-section="order">
+							<i class="fas fa-shopping-cart"></i>
+							<span>Pedidos</span>
+						</a>
+					</li>
+					<li class="admin-nav-item">
+						<a href="admin.html" class="admin-nav-link" data-section="user">
+							<i class="fas fa-users"></i>
+							<span>Usuários</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</aside>
+
+		<!-- Main Content -->
+		<main class="admin-main">
+
+			<!-- Dashboard Section -->
+			<section id="dashboard-section" class="admin-section active">
+				<div class="admin-header-section">
+					<h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+					<p>Visão geral do sistema</p>
+				</div>
+
+				<!-- Stats Cards -->
+				<div class="stats-grid">
+					<div class="stat-card">
+						<div class="stat-icon">
+							<i class="fas fa-box text-primary"></i>
+						</div>
+						<div class="stat-content">
+							<h3>48</h3>
+							<p>Total de Produtos</p>
+						</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-icon">
+							<i class="fas fa-users text-success"></i>
+						</div>
+						<div class="stat-content">
+							<h3>234</h3>
+							<p>Usuários Cadastrados</p>
+						</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-icon">
+							<i class="fas fa-shopping-cart text-warning"></i>
+						</div>
+						<div class="stat-content">
+							<h3>127</h3>
+							<p>Pedidos Realizados</p>
+						</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-icon">
+							<i class="fas fa-dollar-sign text-success"></i>
+						</div>
+						<div class="stat-content">
+							<h3>R$ 68.450,00</h3>
+							<p>Total em Vendas</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Recent Activity -->
+				<div class="admin-grid">
+					<div class="admin-card">
+						<div class="card-header">
+							<h3>Pedidos Recentes</h3>
+						</div>
+						<div class="card-content">
+							<div class="activity-list">
+								<div class="activity-item">
+									<i class="fas fa-shopping-cart text-success"></i>
+									<div>
+										<strong>Pedido #125</strong>
+										<span>Maria Santos</span>
+										<small>R$ 450,00 - Entregue</small>
+									</div>
+								</div>
+								<div class="activity-item">
+									<i class="fas fa-shopping-cart text-warning"></i>
+									<div>
+										<strong>Pedido #124</strong>
+										<span>Carlos Oliveira</span>
+										<small>R$ 1.200,00 - Em Transporte</small>
+									</div>
+								</div>
+								<div class="activity-item">
+									<i class="fas fa-shopping-cart text-danger"></i>
+									<div>
+										<strong>Pedido #123</strong>
+										<span>Ana Costa</span>
+										<small>R$ 320,00 - Cancelado</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="admin-card">
+						<div class="card-header">
+							<h3>Produtos Mais Vendidos</h3>
+						</div>
+						<div class="card-content">
+							<div class="product-ranking">
+								<div class="ranking-item">
+									<span class="rank">1º</span>
+									<span class="product-name">Notebook Dell Inspiron 15</span>
+									<span class="sales-count">45 vendas</span>
+								</div>
+								<div class="ranking-item">
+									<span class="rank">2º</span>
+									<span class="product-name">Mouse Gamer RGB</span>
+									<span class="sales-count">38 vendas</span>
+								</div>
+								<div class="ranking-item">
+									<span class="rank">3º</span>
+									<span class="product-name">Teclado Mecânico</span>
+									<span class="sales-count">32 vendas</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Produtos Delete Confirmation Section -->
+			<!-- ⚠️ THYMELEAF: Remover style="display:none" e adicionar th:if="${adminSection == 'productDelete'}" -->
+			<section id="delete-confirmation" class="admin-section" style="display:none">
+				<div class="admin-card">
+					<div class="card-header">
+						<h3>
+							<i class="fas fa-exclamation-triangle text-warning"></i>
+							Excluir Produto
+						</h3>
+					</div>
+					<div class="card-content">
+						<div class="delete-confirmation">
+							<div class="warning-icon">
+								<i class="fas fa-exclamation-triangle"></i>
+							</div>
+							<h2>Confirmar Exclusão</h2>
+							<p>Tem certeza que deseja excluir o produto:</p>
+							<h4 class="product-name-highlight">Notebook Dell Inspiron 15</h4>
+							<p class="warning-text">Esta ação não poderá ser desfeita.</p>
+						</div>
+					</div>
+					<div class="card-footer delete-footer"
+						style="display: flex; justify-content: center; padding-bottom: 2rem;">
+						<div class="form-actions" style="gap: 1rem;">
+							<a href="admin.html" class="btn btn-outline">
+								<i class="fas fa-times"></i> Cancelar
+							</a>
+							<a href="admin.html" class="btn btn-danger">
+								<i class="fas fa-trash"></i> Excluir
+							</a>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Produtos Section -->
+			<!-- ⚠️ THYMELEAF: Remover style="display:none" e adicionar th:if="${adminSection == 'product'}" -->
+			<section id="produtos-section" class="admin-section" style="display:none">
+				<div class="admin-header-section">
+					<h2><i class="fas fa-box"></i> Gestão de Produtos</h2>
+					<a href="admin.html" class="btn btn-primary" id="add-produto-btn">
+						<i class="fas fa-plus"></i> Adicionar Produto
+					</a>
+				</div>
+
+				<!-- Products Form -->
+				<form id="produto-form" class="form-grid two-columns" action="admin.html" method="POST">
+					<input type="hidden" name="id" value="">
+					<div class="form-group">
+						<label for="produto-nome">Nome do Produto</label>
+						<input type="text" id="produto-nome" name="name" required>
+					</div>
+					<div class="form-group">
+						<label for="produto-categoria">Categoria</label>
+						<select id="produto-categoria" name="category" required>
+							<option value="">Selecione uma categoria</option>
+							<option value="ELECTRONICS">Eletrônicos</option>
+							<option value="CLOTHING">Roupas e Acessórios</option>
+							<option value="HOME_GARDEN">Casa e Jardim</option>
+							<option value="SPORTS">Esportes e Lazer</option>
+							<option value="TOYS">Brinquedos</option>
+							<option value="BEAUTY">Beleza e Saúde</option>
+							<option value="AUTOMOTIVE">Automotivo</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="produto-preco">Preço</label>
+						<input type="number" id="produto-preco" name="price" step="0.01" value="0" required>
+					</div>
+					<div class="form-group">
+						<label for="produto-status">Status</label>
+						<select id="produto-status" name="status" required>
+							<option value="ativo">Ativo</option>
+							<option value="inativo">Inativo</option>
+						</select>
+					</div>
+					<div class="form-group full-width">
+						<label for="produto-descricao">Descrição</label>
+						<textarea id="produto-descricao" name="description" rows="4" required></textarea>
+					</div>
+
+					<div class="form-actions">
+						<button type="button" class="btn btn-outline btn-form">
+							<i class="fas fa-times"></i> Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary btn-form">
+							<i class="fas fa-save"></i> Salvar
+						</button>
+					</div>
+				</form>
+				<br>
+				<hr><br>
+				<!-- Fim Form Produto Section -->
+
+				<!-- Products Table -->
+				<!-- Filters -->
+				<div class="admin-filters">
+					<div class="filter-group">
+						<input type="text" id="search-produtos" placeholder="Buscar produtos..." class="admin-input">
+						<select id="filter-categoria" class="admin-select"
+							onchange="window.location.href = 'admin.html' + (this.value ? '?category=' + encodeURIComponent(this.value) : '')">
+							<option value="" selected>Todas as categorias</option>
+							<option value="ELECTRONICS">Eletrônicos</option>
+							<option value="CLOTHING">Roupas e Acessórios</option>
+							<option value="HOME_GARDEN">Casa e Jardim</option>
+							<option value="SPORTS">Esportes e Lazer</option>
+							<option value="TOYS">Brinquedos</option>
+							<option value="BEAUTY">Beleza e Saúde</option>
+							<option value="AUTOMOTIVE">Automotivo</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="admin-table-container">
+					<table class="admin-table" id="produtos-table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Nome</th>
+								<th>Categoria</th>
+								<th>Preço</th>
+								<th>Status</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1</td>
+								<td>Notebook Dell Inspiron 15</td>
+								<td>Eletrônicos</td>
+								<td>R$ 3.499,00</td>
+								<td>ativo</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-edit" title="Editar">
+										<i class="fas fa-edit"></i>
+									</a>
+									<a href="admin.html" class="btn-icon btn-delete" title="Excluir">
+										<i class="fas fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>Mouse Gamer RGB</td>
+								<td>Eletrônicos</td>
+								<td>R$ 149,90</td>
+								<td>ativo</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-edit" title="Editar">
+										<i class="fas fa-edit"></i>
+									</a>
+									<a href="admin.html" class="btn-icon btn-delete" title="Excluir">
+										<i class="fas fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>Camiseta Algodão Premium</td>
+								<td>Roupas e Acessórios</td>
+								<td>R$ 79,90</td>
+								<td>inativo</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-edit" title="Editar">
+										<i class="fas fa-edit"></i>
+									</a>
+									<a href="admin.html" class="btn-icon btn-delete" title="Excluir">
+										<i class="fas fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<!-- Categorias Section -->
+			<!-- ⚠️ THYMELEAF: Remover style="display:none" e adicionar th:if="${adminSection == 'category'}" -->
+			<section id="categorias-section" class="admin-section" style="display:none">
+				<div class="admin-header-section">
+					<h2><i class="fas fa-tags"></i> Gestão de Categorias</h2>
+					<button class="btn btn-primary" id="add-categoria-btn">
+						<i class="fas fa-plus"></i> Adicionar Categoria
+					</button>
+				</div>
+
+				<div class="admin-table-container">
+					<table class="admin-table" id="categorias-table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Nome</th>
+								<th>Descrição</th>
+								<th>Produtos</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						<tbody id="categorias-tbody">
+							<!-- Dynamic content -->
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<!-- Delete User Confirmation Section -->
+			<!-- ⚠️ THYMELEAF: Remover style="display:none" e adicionar th:if="${adminSection == 'userDelete'}" -->
+			<section id="delete-confirmation-user" class="admin-section" style="display:none">
+				<div class="admin-card" style="max-width:600px; margin:0 auto;">
+					<div class="card-header">
+						<h3>
+							<i class="fas fa-exclamation-triangle text-warning"></i>
+							Excluir Usuário
+						</h3>
+					</div>
+					<div class="card-content">
+						<div class="delete-confirmation">
+							<div class="warning-icon">
+								<i class="fas fa-exclamation-triangle"></i>
+							</div>
+							<h2>Confirmar Exclusão</h2>
+							<p>Tem certeza que deseja excluir o usuário:</p>
+							<h4 class="product-name-highlight">Maria Santos (maria.santos@email.com)</h4>
+							<p class="warning-text">Esta ação não poderá ser desfeita.</p>
+						</div>
+					</div>
+
+					<div class="card-footer delete-footer"
+						style="display: flex; justify-content: center; padding-bottom: 2rem;">
+						<div class="form-actions" style="gap: 1rem;">
+							<a href="admin.html" class="btn btn-outline">
+								<i class="fas fa-times"></i> Cancelar
+							</a>
+							<a href="admin.html" class="btn btn-danger">
+								<i class="fas fa-trash"></i> Excluir
+							</a>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Usuários Section -->
+			<!-- ⚠️ THYMELEAF: Remover style="display:none" e adicionar th:if="${adminSection == 'user'}" -->
+			<section id="usuarios-section" class="admin-section" style="display:none">
+				<div class="admin-header-section">
+					<h2><i class="fas fa-users"></i> Gestão de Usuários</h2>
+					<a href="admin.html" class="btn btn-primary" id="add-usuario-btn">
+						<i class="fas fa-plus"></i> Adicionar Usuário
+					</a>
+				</div>
+
+				<form id="usuario-form" class="form-grid two-columns" action="admin.html" method="POST">
+					<input type="hidden" name="id" value="">
+					<input type="hidden" name="createdAt" value="">
+					<div class="form-group">
+						<label for="usuario-firstname">Nome</label>
+						<input type="text" id="usuario-firstname" name="firstName" required>
+					</div>
+					<div class="form-group">
+						<label for="usuario-lastname">Sobrenome</label>
+						<input type="text" id="usuario-lastname" name="lastName" required>
+					</div>
+					<div class="form-group">
+						<label for="usuario-email">E-mail</label>
+						<input type="email" id="usuario-email" name="email" required>
+					</div>
+					<div class="form-group">
+						<label for="usuario-phone">Telefone</label>
+						<input type="tel" id="usuario-phone" name="phone" required placeholder="(11) 99999-9999"
+							maxlength="15">
+					</div>
+					<div class="form-group">
+						<label for="usuario-password">
+							<i class="fas fa-lock"></i> Senha
+						</label>
+						<div class="password-field">
+							<input type="password" id="usuario-password" name="password" required
+								placeholder="Digite a senha" minlength="8">
+							<button type="button" class="password-toggle" id="usuario-password-toggle">
+								<i class="fas fa-eye"></i>
+							</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="usuario-confirm-password">
+							<i class="fas fa-lock"></i> Confirmar Senha
+						</label>
+						<div class="password-field">
+							<input type="password" id="usuario-confirm-password" name="confirmPassword" required
+								placeholder="Confirme a senha">
+							<button type="button" class="password-toggle" id="usuario-confirm-password-toggle">
+								<i class="fas fa-eye"></i>
+							</button>
+						</div>
+					</div>
+
+					<div class="password-requirements full-width" id="usuario-password-requirements">
+						<p><i class="fas fa-info-circle"></i> Sua senha deve ter:</p>
+						<ul>
+							<li id="usuario-req-length"><i class="fas fa-times"></i> Pelo menos 8 caracteres</li>
+							<li id="usuario-req-uppercase"><i class="fas fa-times"></i> Uma letra maiúscula</li>
+							<li id="usuario-req-number"><i class="fas fa-times"></i> Um número</li>
+							<li id="usuario-req-special"><i class="fas fa-times"></i> Um caractere especial</li>
+						</ul>
+					</div>
+
+					<div class="form-group">
+						<label for="usuario-status">Status</label>
+						<select id="usuario-status" name="status" required>
+							<option value="">Selecione um status</option>
+							<option value="ACTIVE">Ativo</option>
+							<option value="INACTIVE">Inativo</option>
+							<option value="BLOCKED">Bloqueado</option>
+							<option value="SUSPENDED">Suspenso</option>
+						</select>
+					</div>
+
+					<div class="form-actions">
+						<button type="button" class="btn btn-outline btn-form">
+							<i class="fas fa-times"></i> Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary btn-form">
+							<i class="fas fa-save"></i> Salvar
+						</button>
+					</div>
+				</form>
+				<br>
+				<hr><br>
+
+				<!-- Filters -->
+				<div class="admin-filters">
+					<div class="filter-group">
+						<input type="text" id="search-usuarios" placeholder="Buscar usuários..." class="admin-input">
+						<select id="filter-status" class="admin-select"
+							onchange="window.location.href = 'admin.html' + (this.value ? '?status=' + encodeURIComponent(this.value) : '')">
+							<option value="" selected>Todos os status</option>
+							<option value="ACTIVE">Ativo</option>
+							<option value="INACTIVE">Inativo</option>
+							<option value="BLOCKED">Bloqueado</option>
+							<option value="SUSPENDED">Suspenso</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="admin-table-container">
+					<table class="admin-table" id="usuarios-table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Nome</th>
+								<th>E-mail</th>
+								<th>Telefone</th>
+								<th>Status</th>
+								<th>Data Cadastro</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						<tbody id="usuarios-tbody">
+							<tr>
+								<td>1</td>
+								<td>Maria Santos</td>
+								<td>maria.santos@email.com</td>
+								<td>(11) 98765-4321</td>
+								<td>ACTIVE</td>
+								<td>15/03/2025 14:30</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-edit" title="Editar">
+										<i class="fas fa-edit"></i>
+									</a>
+									<a href="admin.html" class="btn-icon btn-delete" title="Excluir">
+										<i class="fas fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>Carlos Oliveira</td>
+								<td>carlos.oliveira@email.com</td>
+								<td>(21) 97654-3210</td>
+								<td>ACTIVE</td>
+								<td>18/03/2025 10:15</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-edit" title="Editar">
+										<i class="fas fa-edit"></i>
+									</a>
+									<a href="admin.html" class="btn-icon btn-delete" title="Excluir">
+										<i class="fas fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td>3</td>
+								<td>Ana Costa</td>
+								<td>ana.costa@email.com</td>
+								<td>(31) 96543-2109</td>
+								<td>INACTIVE</td>
+								<td>20/03/2025 16:45</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-edit" title="Editar">
+										<i class="fas fa-edit"></i>
+									</a>
+									<a href="admin.html" class="btn-icon btn-delete" title="Excluir">
+										<i class="fas fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<!-- Pedidos Section -->
+			<!-- ⚠️ THYMELEAF: Remover style="display:none" e adicionar th:if="${adminSection == 'order'}" -->
+			<section id="pedidos-section" class="admin-section" style="display:none">
+				<div class="admin-header-section">
+					<h2><i class="fas fa-shopping-cart"></i> Gestão de Pedidos</h2>
+				</div>
+
+				<!-- Filters -->
+				<div class="admin-filters">
+					<div class="filter-group">
+						<input type="text" id="search-pedidos" placeholder="Buscar por cliente ou pedido..."
+							class="admin-input">
+						<select id="filter-status-pedido" class="admin-select"
+							onchange="window.location.href = 'admin.html' + (this.value ? '?status=' + encodeURIComponent(this.value) : '')">
+							<option value="" selected>Todos os Status</option>
+							<option value="PENDING">Pendente</option>
+							<option value="CONFIRMED">Confirmado</option>
+							<option value="PAID">Pago</option>
+							<option value="SHIPPED">Enviado</option>
+							<option value="DELIVERED">Entregue</option>
+							<option value="CANCELLED">Cancelado</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="admin-table-container">
+					<table class="admin-table" id="pedidos-table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Cliente</th>
+								<th>Total Itens</th>
+								<th>Valor Total</th>
+								<th>Status</th>
+								<th>Pagamento</th>
+								<th>Data</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						<tbody id="pedidos-tbody">
+							<tr>
+								<td>125</td>
+								<td>Maria Santos</td>
+								<td>3</td>
+								<td>R$ 450,00</td>
+								<td>Entregue</td>
+								<td>Cartão de Crédito</td>
+								<td>15/03/2025 14:30</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-view" title="Ver Detalhes">
+										<i class="fas fa-eye"></i>
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td>124</td>
+								<td>Carlos Oliveira</td>
+								<td>5</td>
+								<td>R$ 1.200,00</td>
+								<td>Em Transporte</td>
+								<td>PIX</td>
+								<td>18/03/2025 10:15</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-view" title="Ver Detalhes">
+										<i class="fas fa-eye"></i>
+									</a>
+								</td>
+							</tr>
+							<tr>
+								<td>123</td>
+								<td>Ana Costa</td>
+								<td>2</td>
+								<td>R$ 320,00</td>
+								<td>Cancelado</td>
+								<td>Boleto</td>
+								<td>20/03/2025 16:45</td>
+								<td class="action-buttons">
+									<a href="admin.html" class="btn-icon btn-view" title="Ver Detalhes">
+										<i class="fas fa-eye"></i>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</main>
+	</div>
+
+	<script th:src="@{/js/main.js}" src="/js/main.js"></script>
+	<script th:src="@{/js/admin.js}" src="/js/admin.js"></script>
+</body>
+
+</html>

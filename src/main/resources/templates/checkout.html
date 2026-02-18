@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - E-commerce Baltazar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css">
+	<link rel="stylesheet" th:href="@{/css/admin.css}" href="/css/admin.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <h1><i class="fas fa-shopping-bag"></i> E-commerce</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#produtos">Produtos</a></li>
+            </ul>
+            <div class="user-actions">
+                <a href="index.html" class="cart-btn" id="cart-btn" title="Carrinho de compras">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </a>
+                <div class="dropdown">
+                    <button class="btn btn-outline dropdown-toggle" id="profile-dropdown">
+                        <i class="fas fa-user"></i> <span>Perfil</span> <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="signin.html" class="dropdown-item">
+                            <i class="fas fa-sign-in-alt"></i> Fazer Login
+                        </a>
+                        <a href="signup.html" class="dropdown-item">
+                            <i class="fas fa-user-plus"></i> Criar Conta
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="admin.html" class="dropdown-item">
+                            <i class="fas fa-cogs"></i> Área Administrativa
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="index.html" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="cart-section">
+        <div class="container">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-credit-card"></i>
+                        Confirmação do Pedido
+                    </h3>
+                </div>
+                <div class="card-content">
+                    <!-- Order Summary -->
+                    <form class="form-grid three-columns" style="margin-bottom: 2rem;">
+                        <div class="form-group">
+                            <label for="checkout-user">Usuário</label>
+                            <input type="text" id="checkout-user" value="João Silva" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkout-items">Total de Itens</label>
+                            <input type="text" id="checkout-items" value="2" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkout-total">Valor Total</label>
+                            <input type="text" id="checkout-total" value="R$ 3.498,00" readonly>
+                        </div>
+                    </form>
+
+                    <!-- Payment Method -->
+                    <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">
+                            <i class="fas fa-qrcode"></i> Método de Pagamento
+                        </h4>
+                        <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+                            <strong>PIX</strong> - Pagamento via QR Code
+                        </p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                            Após confirmar, você receberá um email com o QR Code para pagamento.
+                        </p>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Itens do Pedido</h4>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Preço Unitário</th>
+                                    <th>Quantidade</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Notebook Dell Inspiron</td>
+                                    <td>R$ 2.199,00</td>
+                                    <td>1</td>
+                                    <td>R$ 2.199,00</td>
+                                </tr>
+                                <tr>
+                                    <td>Smartphone Galaxy S21</td>
+                                    <td>R$ 1.299,00</td>
+                                    <td>1</td>
+                                    <td>R$ 1.299,00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer" style="display: flex; justify-content: center; padding-bottom: 2rem;">
+                    <form action="order-success.html" method="POST" style="display: contents;">
+                        <div class="form-actions" style="gap: 1rem;">
+                            <a href="index.html" class="btn btn-outline">
+                                <i class="fas fa-arrow-left"></i> Voltar ao Carrinho
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check-circle"></i> Confirmar Pedido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="theme-toggle" title="Alternar tema">
+        <i class="fas fa-sun"></i>
+    </button>
+
+   <script th:src="@{/js/main.js}" src="/js/main.js"></script>
+</body>
+</html>
