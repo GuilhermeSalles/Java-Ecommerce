@@ -8,30 +8,33 @@ const profileDropdown = document.getElementById('profile-dropdown');
 const dropdownMenu = document.getElementById('dropdown-menu');
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     setupSmoothScroll();
     setupThemeToggle();
     setupDropdown();
     loadSavedTheme();
+    setupCategoryFilters();
 });
 
-// Função viewProduct usada nos botões "Detalhe" dos produtos
+// Função viewProduct (se ainda usar em algum lugar)
 function viewProduct(productId) {
     console.log(`Ver detalhes do produto ${productId}`);
     alert(`Visualizando produto ${productId}. Esta funcionalidade será conectada ao backend via Thymeleaf.`);
 }
 
-// Smooth scroll para navegação (apenas para âncoras internas)
+// ====================================
+// Smooth Scroll
+// ====================================
 function setupSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        // Ignorar links de dropdown que não são âncoras de seção
+        // Ignorar links do dropdown que não são âncoras de seção
         if (anchor.closest('.dropdown-menu')) return;
 
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
+            const target = document.querySelector(href);
 
             // Só aplicar smooth scroll para âncoras que existem na página
-            const target = document.querySelector(href);
             if (target) {
                 e.preventDefault();
                 target.scrollIntoView({
@@ -43,7 +46,9 @@ function setupSmoothScroll() {
     });
 }
 
-// Theme Toggle Functions
+// ====================================
+// Theme Toggle
+// ====================================
 function setupThemeToggle() {
     if (!themeToggle) return;
     themeToggle.addEventListener('click', toggleTheme);
@@ -56,15 +61,7 @@ function toggleTheme() {
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
 
-    // Update button icon
-    const iconElement = themeToggle.querySelector('i');
-    if (newTheme === 'light') {
-        iconElement.className = 'fas fa-moon';
-        themeToggle.title = 'Alternar para tema escuro';
-    } else {
-        iconElement.className = 'fas fa-sun';
-        themeToggle.title = 'Alternar para tema claro';
-    }
+    updateThemeIcon(newTheme);
 }
 
 function loadSavedTheme() {
@@ -73,9 +70,16 @@ function loadSavedTheme() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    // Update button icon based on saved theme
+    updateThemeIcon(savedTheme);
+}
+
+function updateThemeIcon(theme) {
+    if (!themeToggle) return;
+
     const iconElement = themeToggle.querySelector('i');
-    if (savedTheme === 'light') {
+    if (!iconElement) return;
+
+    if (theme === 'light') {
         iconElement.className = 'fas fa-moon';
         themeToggle.title = 'Alternar para tema escuro';
     } else {
@@ -84,31 +88,108 @@ function loadSavedTheme() {
     }
 }
 
-// Dropdown Functions
+// ====================================
+// Dropdown Perfil
+// ====================================
 function setupDropdown() {
     if (!profileDropdown || !dropdownMenu) return;
 
-    profileDropdown.addEventListener('click', function(e) {
+    profileDropdown.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         toggleDropdown();
     });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!profileDropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+    // Fechar dropdown clicando fora
+    document.addEventListener('click', function (e) {
+        const dropdownWrapper = profileDropdown.parentElement; // .dropdown
+        const clickedInside =
+            dropdownWrapper.contains(e.target) || dropdownMenu.contains(e.target);
+
+        if (!clickedInside) {
             closeDropdown();
         }
     });
 }
 
 function toggleDropdown() {
-    const dropdown = profileDropdown.parentElement;
+    const dropdown = profileDropdown.parentElement; // .dropdown
     dropdown.classList.toggle('active');
 }
 
 function closeDropdown() {
     if (!profileDropdown) return;
-    const dropdown = profileDropdown.parentElement;
+    const dropdown = profileDropdown.parentElement; // .dropdown
     dropdown.classList.remove('active');
+}
+
+// ====================================
+// CATEGORY FILTERS (client-side)
+// ====================================
+function setupCategoryFilters() {
+    const filterContainer = document.getElementById('categories-filter');
+    const productCards = document.querySelectorAll('.product-card');
+
+    if (!filterContainer || productCards.length === 0) return;
+
+    const buttons = filterContainer.querySelectorAll('.category-btn');
+
+    // aplica filtro inicial via URL (?category=ELECTRONICS etc)
+    const initialCategory = getCategoryFromUrl() || 'ALL';
+    applyCategoryFilter(initialCategory, buttons, productCards);
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const category = normalizeCategory(btn.dataset.category || 'ALL');
+            applyCategoryFilter(category, buttons, productCards);
+            updateUrlCategory(category);
+        });
+    });
+}
+
+function applyCategoryFilter(category, buttons, productCards) {
+    const normalized = normalizeCategory(category || 'ALL');
+
+    // ativa o botão correto
+    buttons.forEach(b => {
+        const bCat = normalizeCategory(b.dataset.category || '');
+        b.classList.toggle('active', bCat === normalized);
+    });
+
+    // filtra cards
+    productCards.forEach(card => {
+        const cardCategory = normalizeCategory(card.dataset.category || '');
+
+        const show =
+            normalized === 'ALL' ||
+            normalized === '' ||
+            cardCategory === normalized;
+
+        card.style.display = show ? '' : 'none';
+    });
+}
+
+function normalizeCategory(value) {
+    return (value || '')
+        .toString()
+        .trim()
+        .toUpperCase();
+}
+
+function getCategoryFromUrl() {
+    const url = new URL(window.location.href);
+    const cat = url.searchParams.get('category');
+    return cat ? normalizeCategory(cat) : null;
+}
+
+function updateUrlCategory(category) {
+    const url = new URL(window.location.href);
+
+    if (!category || normalizeCategory(category) === 'ALL') {
+        url.searchParams.delete('category');
+    } else {
+        url.searchParams.set('category', normalizeCategory(category));
+    }
+
+    window.history.replaceState({}, '', url.toString());
 }

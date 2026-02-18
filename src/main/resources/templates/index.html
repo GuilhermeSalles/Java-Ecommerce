@@ -1,296 +1,188 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-commerce - Baltazar</title>
+
+    <title th:text="${pageTitle}">E-commerce - Baltazar</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-	<link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css">
-	<link rel="stylesheet" th:href="@{/css/admin.css}" href="/css/admin.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
+
 <body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="nav-container">
-            <div class="logo">
-                <h1>
-                    <i class="fas fa-shopping-bag"></i> E-commerce
-                </h1>
+
+<!-- Header -->
+<header class="header">
+    <nav class="nav-container">
+
+        <div class="logo">
+            <h1>
+                <i class="fas fa-shopping-bag"></i>
+                <span th:text="${brandName}">E-commerce</span>
+            </h1>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/#produtos}">Produtos</a></li>
+            <li><a th:href="@{/admin}">Meus Pedidos</a></li>
+        </ul>
+
+        <!-- ✅ Mantido do original: carrinho + perfil -->
+        <div class="user-actions">
+            <!-- Carrinho -->
+            <a th:href="@{/#cart-section}" class="cart-btn" id="cart-btn" title="Carrinho de compras">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cart-count"
+                      th:text="${cartCount != null ? cartCount : 0}">0</span>
+            </a>
+
+            <!-- Perfil -->
+            <div class="dropdown">
+                <button class="btn btn-outline dropdown-toggle" id="profile-dropdown" type="button">
+                    <i class="fas fa-user"></i>
+                    <span th:text="${profileLabel != null ? profileLabel : 'Perfil'}">Perfil</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <a th:href="@{/signin}" class="dropdown-item">
+                        <i class="fas fa-sign-in-alt"></i> Fazer Login
+                    </a>
+
+                    <a th:href="@{/signup}" class="dropdown-item">
+                        <i class="fas fa-user-plus"></i> Criar Conta
+                    </a>
+
+                    <hr class="dropdown-divider">
+
+                    <a th:href="@{/admin}" class="dropdown-item">
+                        <i class="fas fa-cogs"></i> Área Administrativa
+                    </a>
+
+                    <hr class="dropdown-divider">
+
+                    <a th:href="@{/logout}" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="#produtos">Produtos</a></li>
-                <li><a href="admin.html">Meus Pedidos</a></li>
-            </ul>
-            <div class="user-actions">
-                <a href="index.html" class="cart-btn" id="cart-btn" title="Carrinho de compras">
+        </div>
+    </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="home">
+    <div class="hero-container">
+        <h2>Sua Loja Online Completa</h2>
+        <p>Descubra produtos incríveis com os melhores preços e entrega rápida.</p>
+        <a href="#produtos" class="btn btn-primary">Ver Produtos</a>
+    </div>
+</section>
+
+<!-- (Opcional) Carrinho - por enquanto escondido (igual original) -->
+<section class="cart-section" style="display: none;" id="cart-section">
+    <div class="container">
+        <div class="admin-card">
+            <div class="card-header">
+                <h3>
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count" id="cart-count">0</span>
-                </a>
-                <div class="dropdown">
-                    <button class="btn btn-outline dropdown-toggle" id="profile-dropdown">
-                        <i class="fas fa-user"></i> <span>Perfil</span> <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="dropdown-menu" id="dropdown-menu">
-                        <a href="signin.html" class="dropdown-item">
-                            <i class="fas fa-sign-in-alt"></i> Fazer Login
-                        </a>
-                        <a href="signup.html" class="dropdown-item">
-                            <i class="fas fa-user-plus"></i> Criar Conta
-                        </a>
-                        <hr class="dropdown-divider">
-                        <a href="admin.html" class="dropdown-item">
-                            <i class="fas fa-cogs"></i> Área Administrativa
-                        </a>
-                        <hr class="dropdown-divider">
-                        <a href="index.html" class="dropdown-item">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </div>
+                    Carrinho de Compras
+                </h3>
+            </div>
+
+            <div class="card-content">
+                <div class="cart-empty">
+                    <i class="fas fa-shopping-cart" style="font-size: 64px; color: var(--text-secondary);"></i>
+                    <p>Seu carrinho está vazio</p>
                 </div>
             </div>
-        </nav>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-container">
-            <h2>Sua Loja Online Completa</h2>
-            <p>Descubra produtos incríveis com os melhores preços e entrega rápida. Tecnologia e qualidade em um só lugar.</p>
-            <a href="#produtos" class="btn btn-primary">Ver Produtos</a>
-        </div>
-    </section>
-
-    <!-- Shopping Cart Section (hidden by default) -->
-    <!-- ⚠️ THYMELEAF: Remover style="display: none;" e adicionar th:if="${shoppingCartView != null}" -->
-    <section class="cart-section" style="display: none;" id="cart-section">
-        <div class="container">
-            <div class="admin-card">
-                <div class="card-header">
-                    <h3>
-                        <i class="fas fa-shopping-cart"></i>
-                        Carrinho de Compras
-                    </h3>
-                </div>
-                <div class="card-content">
-                    <!-- Cart Summary Form -->
-                    <form class="form-grid three-columns">
-                        <div class="form-group">
-                            <label for="cart-user">Usuário</label>
-                            <input type="text" id="cart-user" value="João Silva" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="cart-items">Total de Itens</label>
-                            <input type="text" id="cart-items" value="3" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="cart-total">Valor Total</label>
-                            <input type="text" id="cart-total" value="R$ 3.497,00" readonly>
-                        </div>
-                    </form>
-
-                    <!-- Cart Items Table -->
-                    <div style="margin-top: 2rem;">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Preço Unitário</th>
-                                    <th>Quantidade</th>
-                                    <th>Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Smartphone Galaxy S21</td>
-                                    <td>R$ 1.299,00</td>
-                                    <td>1</td>
-                                    <td>R$ 1.299,00</td>
-                                </tr>
-                                <tr>
-                                    <td>Notebook Dell Inspiron</td>
-                                    <td>R$ 2.199,00</td>
-                                    <td>1</td>
-                                    <td>R$ 2.199,00</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Empty Cart Message (hidden by default) -->
-                    <!-- ⚠️ THYMELEAF: Remover style="display: none;" e adicionar th:if="${shoppingCartView == null or shoppingCartView.isEmpty()}" -->
-                    <div class="cart-empty" style="display: none;">
-                        <i class="fas fa-shopping-cart" style="font-size: 64px; color: var(--text-secondary);"></i>
-                        <p>Seu carrinho está vazio</p>
-                    </div>
-                </div>
-                <div class="card-footer" style="display: flex; justify-content: center; padding-bottom: 2rem;">
-                    <div class="form-actions" style="gap: 1rem;">
-                        <a href="#produtos" class="btn btn-outline">
-                            <i class="fas fa-arrow-left"></i> Comprar Mais
-                        </a>
-                        <a href="checkout.html" class="btn btn-primary">
-                            <i class="fas fa-check"></i> Finalizar Pedido
-                        </a>
-                    </div>
+            <div class="card-footer" style="display: flex; justify-content: center; padding-bottom: 2rem;">
+                <div class="form-actions" style="gap: 1rem;">
+                    <a href="#produtos" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Comprar Mais
+                    </a>
+                    <a th:href="@{/checkout}" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Finalizar Pedido
+                    </a>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Products Section -->
-    <section class="products-section" id="produtos">
-        <div class="container">
-            <div class="section-header">
-                <h3>Nossos Produtos</h3>
-                <p>Explore nossa seleção cuidadosamente escolhida de produtos</p>
+<!-- Products -->
+<section class="products-section" id="produtos">
+    <div class="container">
+        <div class="section-header">
+            <h3>Nossos Produtos</h3>
+            <p>Explore nossa seleção cuidadosamente escolhida</p>
+        </div>
+
+        <!-- ✅ Filtros (mantendo como buttons, pro JS filtrar sem reload) -->
+        <div class="categories-filter" id="categories-filter">
+            <button type="button" class="category-btn active" data-category="ALL">Todos</button>
+            <button type="button" class="category-btn" data-category="ELECTRONICS">Eletrônicos</button>
+            <button type="button" class="category-btn" data-category="CLOTHING">Roupas</button>
+            <button type="button" class="category-btn" data-category="HOME">Casa & Jardim</button>
+            <button type="button" class="category-btn" data-category="SPORTS">Esportes</button>
+        </div>
+
+        <!-- Grid -->
+        <div class="products-grid" id="products-grid">
+
+            <div class="product-card"
+                 th:each="product : ${products}"
+                 th:attr="data-category=${#strings.toUpperCase(#strings.trim(product.category))}">
+                <div class="product-image">
+                    <i class="fas fa-box"></i>
+                </div>
+
+                <div class="product-info">
+                    <h4 class="product-title" th:text="${product.name}">Nome do Produto</h4>
+
+                    <p class="product-description" th:text="${product.description}">
+                        Descrição do produto
+                    </p>
+
+                    <div class="product-price"
+                         th:text="'R$ ' + ${#numbers.formatDecimal(product.price, 1, 'POINT', 2, 'COMMA')}">
+                        R$ 0,00
+                    </div>
+
+                    <div class="product-actions">
+                        <a th:href="@{/product/{id}(id=${product.id})}"
+                           class="btn btn-outline btn-small">
+                            <i class="fas fa-eye"></i><br>Detalhe
+                        </a>
+
+                        <a th:href="@{/?addToCart={id}(id=${product.id})}"
+                           class="btn btn-primary btn-small">
+                            <i class="fas fa-cart-plus"></i><br>Adicionar
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <!-- Categories Filter -->
-            <div class="categories-filter">
-                <a href="index.html" class="category-btn active" data-category="all">Todos</a>
-                <a href="index.html?category=ELECTRONICS" class="category-btn"><span>Eletrônicos</span></a>
-                <a href="index.html?category=CLOTHING" class="category-btn"><span>Roupas</span></a>
-                <a href="index.html?category=HOME_GARDEN" class="category-btn"><span>Casa e Jardim</span></a>
-                <a href="index.html?category=SPORTS" class="category-btn"><span>Esportes</span></a>
-                <a href="index.html?category=TOYS" class="category-btn"><span>Brinquedos</span></a>
-                <a href="index.html?category=BEAUTY" class="category-btn"><span>Beleza</span></a>
-                <a href="index.html?category=AUTOMOTIVE" class="category-btn"><span>Automotivo</span></a>
-            </div>
-
-            <!-- Products Grid -->
-            <div class="products-grid" id="products-container">
-                <!-- Product Card 1 -->
-                <div class="product-card" data-category="ELECTRONICS">
-                    <div class="product-image">
-                        <i class="fas fa-laptop"></i>
-                    </div>
-                    <div class="product-info">
-                        <h4 class="product-title">Notebook Dell Inspiron</h4>
-                        <p class="product-description">Intel Core i5, 8GB RAM, 256GB SSD</p>
-                        <div class="product-price">R$ 2.199,00</div>
-                        <div class="product-actions">
-                            <button class="btn btn-outline btn-small" onclick="viewProduct(1)">
-                                <i class="fas fa-eye"></i><br>Detalhe
-                            </button>
-                            <a href="index.html?addToCart=1" class="btn btn-primary btn-small">
-                                <i class="fas fa-cart-plus"></i><br>Adicionar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 2 -->
-                <div class="product-card" data-category="ELECTRONICS">
-                    <div class="product-image">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <div class="product-info">
-                        <h4 class="product-title">Smartphone Galaxy S21</h4>
-                        <p class="product-description">128GB, 5G, Câmera 64MP</p>
-                        <div class="product-price">R$ 1.299,00</div>
-                        <div class="product-actions">
-                            <button class="btn btn-outline btn-small" onclick="viewProduct(2)">
-                                <i class="fas fa-eye"></i><br>Detalhe
-                            </button>
-                            <a href="index.html?addToCart=2" class="btn btn-primary btn-small">
-                                <i class="fas fa-cart-plus"></i><br>Adicionar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 3 -->
-                <div class="product-card" data-category="CLOTHING">
-                    <div class="product-image">
-                        <i class="fas fa-tshirt"></i>
-                    </div>
-                    <div class="product-info">
-                        <h4 class="product-title">Camiseta Premium</h4>
-                        <p class="product-description">100% Algodão, Tamanhos P ao GG</p>
-                        <div class="product-price">R$ 89,90</div>
-                        <div class="product-actions">
-                            <button class="btn btn-outline btn-small" onclick="viewProduct(3)">
-                                <i class="fas fa-eye"></i><br>Detalhe
-                            </button>
-                            <a href="index.html?addToCart=3" class="btn btn-primary btn-small">
-                                <i class="fas fa-cart-plus"></i><br>Adicionar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 4 -->
-                <div class="product-card" data-category="HOME_GARDEN">
-                    <div class="product-image">
-                        <i class="fas fa-couch"></i>
-                    </div>
-                    <div class="product-info">
-                        <h4 class="product-title">Sofá Confort</h4>
-                        <p class="product-description">3 Lugares, Tecido Impermeável</p>
-                        <div class="product-price">R$ 1.590,00</div>
-                        <div class="product-actions">
-                            <button class="btn btn-outline btn-small" onclick="viewProduct(4)">
-                                <i class="fas fa-eye"></i><br>Detalhe
-                            </button>
-                            <a href="index.html?addToCart=4" class="btn btn-primary btn-small">
-                                <i class="fas fa-cart-plus"></i><br>Adicionar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 5 -->
-                <div class="product-card" data-category="SPORTS">
-                    <div class="product-image">
-                        <i class="fas fa-dumbbell"></i>
-                    </div>
-                    <div class="product-info">
-                        <h4 class="product-title">Kit Halteres</h4>
-                        <p class="product-description">Par de 5kg, Revestimento Emborrachado</p>
-                        <div class="product-price">R$ 149,90</div>
-                        <div class="product-actions">
-                            <button class="btn btn-outline btn-small" onclick="viewProduct(5)">
-                                <i class="fas fa-eye"></i><br>Detalhe
-                            </button>
-                            <a href="index.html?addToCart=5" class="btn btn-primary btn-small">
-                                <i class="fas fa-cart-plus"></i><br>Adicionar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Card 6 -->
-                <div class="product-card" data-category="TOYS">
-                    <div class="product-image">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <div class="product-info">
-                        <h4 class="product-title">Console Game Pro</h4>
-                        <p class="product-description">512GB, 4K, 2 Controles</p>
-                        <div class="product-price">R$ 2.899,00</div>
-                        <div class="product-actions">
-                            <button class="btn btn-outline btn-small" onclick="viewProduct(6)">
-                                <i class="fas fa-eye"></i><br>Detalhe
-                            </button>
-                            <a href="index.html?addToCart=6" class="btn btn-primary btn-small">
-                                <i class="fas fa-cart-plus"></i><br>Adicionar
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <div th:if="${#lists.isEmpty(products)}">
+                <p>Nenhum produto cadastrado.</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Theme Toggle Button -->
-    <button class="theme-toggle" id="theme-toggle" title="Alternar tema">
-        <i class="fas fa-sun"></i>
-    </button>
+<!-- Botão de tema -->
+<button class="theme-toggle" id="theme-toggle" title="Alternar tema" type="button">
+    <i class="fas fa-sun"></i>
+</button>
 
-  <script th:src="@{/js/main.js}" src="/js/main.js"></script>
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>
