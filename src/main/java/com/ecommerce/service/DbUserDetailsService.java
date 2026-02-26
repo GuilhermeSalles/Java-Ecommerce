@@ -16,6 +16,13 @@ import com.ecommerce.repository.UserRepository;
 import com.ecommerce.security.CustomUserDetails;
 
 @Service
+/**
+ * Serviço responsável por buscar usuários no banco de dados para autenticação.
+ * Implementa UserDetailsService do Spring Security.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class DbUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

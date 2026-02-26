@@ -5,6 +5,13 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_items")
+/**
+ * Entidade JPA que representa um item de um pedido.
+ * Relaciona produto, quantidade, preço unitário e total da linha.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class OrderItem {
 
 	@Id

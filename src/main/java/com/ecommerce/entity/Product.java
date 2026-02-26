@@ -6,6 +6,13 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "product")
+/**
+ * Entidade JPA que representa um produto disponível na loja.
+ * Contém informações como nome, categoria, preço, estado e descrição.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class Product {
 
     @Id

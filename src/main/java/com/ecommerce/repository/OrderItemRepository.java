@@ -9,6 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import com.ecommerce.entity.OrderItem;
 import com.ecommerce.repository.projection.TopProductSalesView;
 
+/**
+ * Repositório Spring Data JPA para operações com a entidade OrderItem.
+ * Inclui consulta customizada para produtos mais vendidos.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("""

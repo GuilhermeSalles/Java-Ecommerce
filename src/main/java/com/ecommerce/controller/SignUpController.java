@@ -13,6 +13,12 @@ import com.ecommerce.entity.User;
 import com.ecommerce.repository.UserRepository;
 
 @Controller
+/**
+ * Controller responsável pelo cadastro de novos usuários.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class SignUpController {
 
     private final UserRepository userRepository;
@@ -23,6 +29,15 @@ public class SignUpController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Endpoint da tela de cadastro de usuário (signup).
+     * Exibe formulário de cadastro e mensagens de sucesso/erro.
+     *
+     * @param success Mensagem de sucesso
+     * @param error Mensagem de erro
+     * @param model Modelo de dados para a view
+     * @return Template signup.html
+     */
     @GetMapping("/signup")
     public String signup(
             @RequestParam(name = "success", required = false) String success,
@@ -39,6 +54,19 @@ public class SignUpController {
         return "signup";
     }
 
+    /**
+     * Endpoint para processar o cadastro de novo usuário.
+     * Recebe dados do formulário, valida e salva o usuário.
+     *
+     * @param firstName Nome
+     * @param lastName Sobrenome
+     * @param email Email
+     * @param phone Telefone
+     * @param password Senha
+     * @param confirmPassword Confirmação de senha
+     * @param model Modelo de dados para a view
+     * @return Redireciona para tela de cadastro com mensagem
+     */
     @PostMapping("/signup")
     public String signupPost(
             @RequestParam("firstName") String firstName,

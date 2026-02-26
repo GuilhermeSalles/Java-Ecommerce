@@ -8,6 +8,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+/**
+ * Entidade JPA que representa um pedido realizado na loja.
+ * Armazena dados do cliente, status de envio, valor total e itens do pedido.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class Order {
 
 	@Id

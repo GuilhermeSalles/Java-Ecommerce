@@ -8,6 +8,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+/**
+ * Classe de configuração de segurança da aplicação.
+ * Define regras de autenticação, autorização, login, logout e proteção CSRF.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class SecurityConfig {
 
     @Bean

@@ -4,6 +4,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * DTO para transporte dos dados do formulário de cadastro de usuário.
+ * Utilizado para receber e validar dados do signup.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class SignupForm {
 
 	@NotBlank

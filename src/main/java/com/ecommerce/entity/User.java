@@ -19,6 +19,13 @@ import jakarta.persistence.UniqueConstraint;
 @Table(name = "users", indexes = { @Index(name = "idx_users_email", columnList = "email"),
 		@Index(name = "idx_users_status", columnList = "status_usuario") }, uniqueConstraints = {
 				@UniqueConstraint(name = "uk_users_email", columnNames = "email") })
+/**
+ * Entidade JPA que representa um usuário do sistema.
+ * Contém dados pessoais, status, permissões e hash da senha.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -7,6 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ecommerce.entity.User;
 
+/**
+ * Implementação customizada de UserDetails para autenticação de usuários.
+ * Adapta a entidade User para o padrão do Spring Security.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class CustomUserDetails implements UserDetails {
 
     private final User user;

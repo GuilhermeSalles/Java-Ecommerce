@@ -25,6 +25,13 @@ import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
 
 @Controller
+/**
+ * Controller responsável pelo painel administrativo.
+ * Gerencia produtos, pedidos, usuários e dashboard de métricas.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public class AdminController {
 
 	private final ProductRepository productRepository;
@@ -44,6 +51,16 @@ public class AdminController {
 	}
 
 	// LISTA / ADMIN
+	/**
+	 * Endpoint do painel administrativo principal.
+	 * Exibe dashboard, produtos, pedidos e usuários, conforme a seção ativa.
+	 *
+	 * @param section Seção ativa do painel (dashboard, products, orders, users)
+	 * @param category Categoria de produto filtrada
+	 * @param userStatus Status de usuário filtrado
+	 * @param model Modelo de dados para a view
+	 * @return Template admin.html
+	 */
 	@GetMapping("/admin")
 	public String admin(@RequestParam(name = "section", required = false, defaultValue = "dashboard") String section,
 			@RequestParam(name = "category", required = false) String category,
@@ -122,6 +139,13 @@ public class AdminController {
 	// PRODUCTS
 	// =========================
 
+	/**
+	 * Endpoint para exibir o formulário de edição de produto.
+	 *
+	 * @param id ID do produto a ser editado
+	 * @param model Modelo de dados para a view
+	 * @return Template admin.html com dados do produto
+	 */
 	@GetMapping("/admin/product/edit/{id}")
 	public String editProduct(@PathVariable("id") Long id, Model model) {
 
@@ -160,6 +184,17 @@ public class AdminController {
 		return "admin";
 	}
 
+	/**
+	 * Endpoint para salvar (criar ou atualizar) um produto.
+	 *
+	 * @param id ID do produto (null para novo)
+	 * @param name Nome do produto
+	 * @param category Categoria
+	 * @param price Preço
+	 * @param state Estado (ativo/inativo)
+	 * @param description Descrição
+	 * @return Redireciona para a seção de produtos
+	 */
 	@PostMapping("/admin/product/save")
 	public String saveProduct(@RequestParam(name = "id", required = false) Long id, @RequestParam("name") String name,
 			@RequestParam("category") String category, @RequestParam("price") BigDecimal price,
@@ -188,6 +223,12 @@ public class AdminController {
 		return "redirect:/admin?section=products";
 	}
 
+	/**
+	 * Endpoint para excluir um produto pelo ID.
+	 *
+	 * @param id ID do produto a ser excluído
+	 * @return Redireciona para a seção de produtos
+	 */
 	@GetMapping("/admin/product/delete/{id}")
 	public String deleteProduct(@PathVariable("id") Long id) {
 		productRepository.deleteById(id);
@@ -198,6 +239,14 @@ public class AdminController {
 	// USERS (CREATE/EDIT/DELETE)
 	// =========================
 
+	/**
+	 * Endpoint para exibir o formulário de edição de usuário.
+	 *
+	 * @param id ID do usuário a ser editado
+	 * @param userStatus Status filtrado
+	 * @param model Modelo de dados para a view
+	 * @return Template admin.html com dados do usuário
+	 */
 	@GetMapping("/admin/user/edit/{id}")
 	public String editUser(@PathVariable("id") Long id,
 			@RequestParam(name = "userStatus", required = false) String userStatus, Model model) {
@@ -260,6 +309,19 @@ public class AdminController {
 		return "admin";
 	}
 
+	/**
+	 * Endpoint para salvar (criar ou atualizar) um usuário.
+	 *
+	 * @param id ID do usuário (null para novo)
+	 * @param firstName Nome
+	 * @param lastName Sobrenome
+	 * @param email Email
+	 * @param phone Telefone
+	 * @param statusUsuario Status
+	 * @param password Senha (opcional)
+	 * @param confirmPassword Confirmação de senha
+	 * @return Redireciona para a seção de usuários
+	 */
 	@PostMapping("/admin/user/save")
 	public String saveUser(@RequestParam(name = "id", required = false) Long id,
 			@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName,
@@ -310,6 +372,12 @@ public class AdminController {
 		return "redirect:/admin?section=users";
 	}
 
+	/**
+	 * Endpoint para excluir um usuário pelo ID.
+	 *
+	 * @param id ID do usuário a ser excluído
+	 * @return Redireciona para a seção de usuários
+	 */
 	@GetMapping("/admin/user/delete/{id}")
 	public String deleteUser(@PathVariable("id") Long id) {
 		userRepository.deleteById(id);

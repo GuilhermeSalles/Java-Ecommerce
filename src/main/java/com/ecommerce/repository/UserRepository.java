@@ -9,6 +9,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ecommerce.entity.StatusUsuario;
 import com.ecommerce.entity.User;
 
+/**
+ * Repositório Spring Data JPA para operações com a entidade User.
+ * Permite consultas, persistência e busca por status/email.
+ *
+ * @author guilherme.sales
+ * @since 26/02/2026
+ */
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByEmail(String email);
