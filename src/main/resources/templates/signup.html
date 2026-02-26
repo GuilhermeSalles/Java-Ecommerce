@@ -1,172 +1,195 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+	<link rel="icon" type="image/svg+xml"
+		      href="data:image/svg+xml,
+		<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'>
+		<path fill='%230f172a'
+		d='M0 176l288 112 288-112L288 64 0 176zm288 176L0 240v112l288 112 288-112V240L288 352z'/>
+		</svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Baltazar</title>
+
+    <title th:text="${pageTitle}">Cadastro - Baltazar Store</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-	<link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css">
-	<link rel="stylesheet" th:href="@{/css/auth.css}" href="/css/auth.css">
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 <body>
-    <!-- Header Simplificado -->
-    <header class="header">
-        <nav class="nav-container">
-            <div class="logo">
-                <a href="index.html">
-                    <h1><i class="fas fa-shopping-bag"></i> E-commerce</h1>
-                </a>
+
+<header class="header">
+    <nav class="nav-container">
+        <div class="logo">
+            <a th:href="@{/}">
+                <h1>
+                    <i class="fas fa-shopping-bag"></i>
+                    <span th:text="${brandName}">Baltazar Store</span>
+                </h1>
+            </a>
+        </div>
+
+        <div class="user-actions">
+            <button class="theme-toggle" id="theme-toggle" title="Alternar tema" type="button">
+                <i class="fas fa-sun"></i>
+            </button>
+        </div>
+    </nav>
+</header>
+
+<main class="auth-main">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2><i class="fas fa-user-plus"></i> Criar sua conta</h2>
+                <p>Cadastre-se e aproveite todas as vantagens</p>
             </div>
-            <div class="user-actions">
-                <button class="theme-toggle" id="theme-toggle" title="Alternar tema">
-                    <i class="fas fa-sun"></i>
+
+            <!-- alerts simples -->
+            <div th:if="${success}" class="alert alert-success">
+                Conta criada com sucesso! Agora faça login.
+            </div>
+            <div th:if="${error}" class="alert alert-error">
+                Ocorreu um erro no cadastro. Tente novamente.
+            </div>
+
+            <!-- Por enquanto sem backend real -->
+            <form class="auth-form" th:action="@{/signup}" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">
+                            <i class="fas fa-user"></i> Nome
+                        </label>
+                        <input type="text" id="firstName" name="firstName" required placeholder="Seu nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">
+                            <i class="fas fa-user"></i> Sobrenome
+                        </label>
+                        <input type="text" id="lastName" name="lastName" required placeholder="Seu sobrenome">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> E-mail
+                    </label>
+                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-phone"></i> Telefone
+                    </label>
+                    <input type="tel" id="phone" name="phone" required placeholder="(11) 99999-9999" maxlength="15">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Senha
+                        </label>
+                        <div class="password-field">
+                            <input type="password" id="password" name="password" required placeholder="Crie uma senha" minlength="8">
+                            <button type="button" class="password-toggle" id="password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <i class="fas fa-lock"></i> Confirmar senha
+                        </label>
+                        <div class="password-field">
+                            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirme sua senha">
+                            <button type="button" class="password-toggle" id="confirm-password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="password-requirements" id="password-requirements">
+                    <p><i class="fas fa-info-circle"></i> Sua senha deve ter:</p>
+                    <ul>
+                        <li id="req-length"><i class="fas fa-times"></i> Pelo menos 8 caracteres</li>
+                        <li id="req-uppercase"><i class="fas fa-times"></i> Uma letra maiúscula</li>
+                        <li id="req-number"><i class="fas fa-times"></i> Um número</li>
+                        <li id="req-special"><i class="fas fa-times"></i> Um caractere especial</li>
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <span class="checkmark"></span>
+                        Eu aceito os <a href="#" class="auth-link">Termos de Uso</a> e a <a href="#" class="auth-link">Política de Privacidade</a>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="newsletter" name="newsletter">
+                        <span class="checkmark"></span>
+                        Quero receber ofertas e novidades por e-mail
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-auth">
+                    <i class="fas fa-user-plus"></i> Criar conta
                 </button>
-            </div>
-        </nav>
-    </header>
 
-    <!-- Auth Container -->
-    <main class="auth-main">
-        <div class="auth-container">
-            <div class="auth-card">
-                <div class="auth-header">
-                    <h2><i class="fas fa-user-plus"></i> Criar sua conta</h2>
-                    <p>Cadastre-se e aproveite todas as vantagens</p>
+                <div class="divider">
+                    <span>ou</span>
                 </div>
 
-                <form class="auth-form" action="index.html" method="post">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="firstName">
-                                <i class="fas fa-user"></i> Nome
-                            </label>
-                            <input type="text" id="firstName" name="firstName" required placeholder="Seu nome">
-                        </div>
-                        <div class="form-group">
-                            <label for="lastName">
-                                <i class="fas fa-user"></i> Sobrenome
-                            </label>
-                            <input type="text" id="lastName" name="lastName" required placeholder="Seu sobrenome">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">
-                            <i class="fas fa-envelope"></i> E-mail
-                        </label>
-                        <input type="email" id="email" name="email" required placeholder="seu@email.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone">
-                            <i class="fas fa-phone"></i> Telefone
-                        </label>
-                        <input type="tel" id="phone" name="phone" required placeholder="(11) 99999-9999" maxlength="15">
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="password">
-                                <i class="fas fa-lock"></i> Senha
-                            </label>
-                            <div class="password-field">
-                                <input type="password" id="password" name="password" required placeholder="Crie uma senha" minlength="8">
-                                <button type="button" class="password-toggle" id="password-toggle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmPassword">
-                                <i class="fas fa-lock"></i> Confirmar senha
-                            </label>
-                            <div class="password-field">
-                                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirme sua senha">
-                                <button type="button" class="password-toggle" id="confirm-password-toggle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="password-requirements" id="password-requirements">
-                        <p><i class="fas fa-info-circle"></i> Sua senha deve ter:</p>
-                        <ul>
-                            <li id="req-length"><i class="fas fa-times"></i> Pelo menos 8 caracteres</li>
-                            <li id="req-uppercase"><i class="fas fa-times"></i> Uma letra maiúscula</li>
-                            <li id="req-number"><i class="fas fa-times"></i> Um número</li>
-                            <li id="req-special"><i class="fas fa-times"></i> Um caractere especial</li>
-                        </ul>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="terms" name="terms" required>
-                            <span class="checkmark"></span>
-                            Eu aceito os <a href="#" class="auth-link">Termos de Uso</a> e a <a href="#" class="auth-link">Política de Privacidade</a>
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="newsletter" name="newsletter">
-                            <span class="checkmark"></span>
-                            Quero receber ofertas e novidades por e-mail
-                        </label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-auth">
-                        <i class="fas fa-user-plus"></i> Criar conta
+                <div class="social-login">
+                    <button type="button" class="btn btn-social btn-google">
+                        <i class="fab fa-google"></i> Cadastrar com Google
                     </button>
-
-                    <div class="divider">
-                        <span>ou</span>
-                    </div>
-
-                    <div class="social-login">
-                        <button type="button" class="btn btn-social btn-google">
-                            <i class="fab fa-google"></i> Cadastrar com Google
-                        </button>
-                        <button type="button" class="btn btn-social btn-facebook">
-                            <i class="fab fa-facebook-f"></i> Cadastrar com Facebook
-                        </button>
-                    </div>
-                </form>
-
-                <div class="auth-footer">
-                    <p>Já tem uma conta? <a href="signin.html" class="auth-link">Fazer login</a></p>
+                    <button type="button" class="btn btn-social btn-facebook">
+                        <i class="fab fa-facebook-f"></i> Cadastrar com Facebook
+                    </button>
                 </div>
-            </div>
+            </form>
 
-            <!-- Decorative Side -->
-            <div class="auth-side">
-                <div class="auth-side-content">
-                    <i class="fas fa-gift auth-side-icon"></i>
-                    <h3>Junte-se a nós!</h3>
-                    <p>Crie sua conta e tenha acesso a ofertas exclusivas, frete grátis e muito mais. É rápido e seguro!</p>
-                    <div class="auth-side-features">
-                        <div class="feature-item">
-                            <i class="fas fa-percentage"></i>
-                            <span>Descontos exclusivos</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-heart"></i>
-                            <span>Lista de desejos</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-history"></i>
-                            <span>Histórico de pedidos</span>
-                        </div>
+            <div class="auth-footer">
+                <p>Já tem uma conta? <a th:href="@{/signin}" class="auth-link">Fazer login</a></p>
+            </div>
+        </div>
+
+        <div class="auth-side">
+            <div class="auth-side-content">
+                <i class="fas fa-gift auth-side-icon"></i>
+                <h3>Junte-se a nós!</h3>
+                <p>Crie sua conta e tenha acesso a ofertas exclusivas, frete grátis e muito mais. É rápido e seguro!</p>
+
+                <div class="auth-side-features">
+                    <div class="feature-item">
+                        <i class="fas fa-percentage"></i>
+                        <span>Descontos exclusivos</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-heart"></i>
+                        <span>Lista de desejos</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-history"></i>
+                        <span>Histórico de pedidos</span>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-	<script th:src="@{/js/main.js}" src="/js/main.js"></script>
-	<script th:src="@{/js/auth.js}" src="/js/auth.js"></script>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/auth.js}"></script>
 </body>
 </html>

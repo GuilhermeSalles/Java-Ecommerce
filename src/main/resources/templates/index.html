@@ -1,188 +1,225 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
+		<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'>
+		<path fill='%230f172a'
+		d='M0 176l288 112 288-112L288 64 0 176zm288 176L0 240v112l288 112 288-112V240L288 352z'/>
+		</svg>">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title th:text="${pageTitle}">E-commerce - Baltazar</title>
+	<title th:text="${pageTitle}">E-commerce - Baltazar</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" th:href="@{/css/styles.css}">
+	<link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 
 <body>
 
-<!-- Header -->
-<header class="header">
-    <nav class="nav-container">
+	<!-- Header -->
+	<header class="header">
+		<nav class="nav-container">
 
-        <div class="logo">
-            <h1>
-                <i class="fas fa-shopping-bag"></i>
-                <span th:text="${brandName}">E-commerce</span>
-            </h1>
-        </div>
+			<div class="logo">
+				<h1>
+					<i class="fas fa-shopping-bag"></i>
+					<span th:text="${brandName}">E-commerce</span>
+				</h1>
+			</div>
 
-        <ul class="nav-menu">
-            <li><a th:href="@{/}">Home</a></li>
-            <li><a th:href="@{/#produtos}">Produtos</a></li>
-            <li><a th:href="@{/admin}">Meus Pedidos</a></li>
-        </ul>
+			<ul class="nav-menu">
+				<li><a th:href="@{/}">Home</a></li>
+				<li><a th:href="@{/#produtos}">Produtos</a></li>
+				<li><a th:href="@{/admin#pedidos}">Meus Pedidos</a></li>
+			</ul>
 
-        <!-- ✅ Mantido do original: carrinho + perfil -->
-        <div class="user-actions">
-            <!-- Carrinho -->
-            <a th:href="@{/#cart-section}" class="cart-btn" id="cart-btn" title="Carrinho de compras">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count" id="cart-count"
-                      th:text="${cartCount != null ? cartCount : 0}">0</span>
-            </a>
+			<!--  Mantido do original: carrinho + perfil -->
+			<div class="user-actions">
+				<!-- Carrinho -->
+				<a th:href="@{/#cart-section}" class="cart-btn" id="cart-btn" title="Carrinho de compras">
+					<i class="fas fa-shopping-cart"></i>
+					<span class="cart-count" id="cart-count" th:text="${cartCount != null ? cartCount : 0}">0</span>
+				</a>
 
-            <!-- Perfil -->
-            <div class="dropdown">
-                <button class="btn btn-outline dropdown-toggle" id="profile-dropdown" type="button">
-                    <i class="fas fa-user"></i>
-                    <span th:text="${profileLabel != null ? profileLabel : 'Perfil'}">Perfil</span>
-                    <i class="fas fa-chevron-down"></i>
-                </button>
+				<!-- Perfil -->
+				<div class="dropdown">
+				    <button class="btn btn-outline dropdown-toggle"
+				            id="profile-dropdown"
+				            type="button">
 
-                <div class="dropdown-menu" id="dropdown-menu">
-                    <a th:href="@{/signin}" class="dropdown-item">
-                        <i class="fas fa-sign-in-alt"></i> Fazer Login
-                    </a>
+				        <!-- Se logado -->
+				        <span sec:authorize="isAuthenticated()"
+				              class="profile-avatar">
 
-                    <a th:href="@{/signup}" class="dropdown-item">
-                        <i class="fas fa-user-plus"></i> Criar Conta
-                    </a>
+				            <!-- Se tiver imagem -->
+				            <img th:if="${#authentication.principal.user.profileImageUrl != null}"
+				                 th:src="@{${#authentication.principal.user.profileImageUrl}}"
+				                 class="avatar-img"/>
 
-                    <hr class="dropdown-divider">
+				            <!-- Se NÃO tiver imagem -->
+				            <i class="fas fa-user"
+				               th:if="${#authentication.principal.user.profileImageUrl == null}">
+				            </i>
+				        </span>
 
-                    <a th:href="@{/admin}" class="dropdown-item">
-                        <i class="fas fa-cogs"></i> Área Administrativa
-                    </a>
+				        <!-- Nome do usuário -->
+				        <span sec:authorize="isAuthenticated()"
+				              th:text="${#authentication.principal.fullName}">
+				        </span>
 
-                    <hr class="dropdown-divider">
+				        <!-- Se NÃO estiver logado -->
+				        <span sec:authorize="!isAuthenticated()">
+				            Perfil
+				        </span>
 
-                    <a th:href="@{/logout}" class="dropdown-item">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-</header>
+				        <i class="fas fa-chevron-down"></i>
+				    </button>
 
-<!-- Hero -->
-<section class="hero" id="home">
-    <div class="hero-container">
-        <h2>Sua Loja Online Completa</h2>
-        <p>Descubra produtos incríveis com os melhores preços e entrega rápida.</p>
-        <a href="#produtos" class="btn btn-primary">Ver Produtos</a>
-    </div>
-</section>
+					<div class="dropdown-menu" id="dropdown-menu">
 
-<!-- (Opcional) Carrinho - por enquanto escondido (igual original) -->
-<section class="cart-section" style="display: none;" id="cart-section">
-    <div class="container">
-        <div class="admin-card">
-            <div class="card-header">
-                <h3>
-                    <i class="fas fa-shopping-cart"></i>
-                    Carrinho de Compras
-                </h3>
-            </div>
+						<!-- Não logado: mostrar Login e Criar Conta -->
+						<div sec:authorize="!isAuthenticated()">
+							<a th:href="@{/signin}" class="dropdown-item">
+								<i class="fas fa-sign-in-alt"></i> Fazer Login
+							</a>
+							<a th:href="@{/signup}" class="dropdown-item">
+								<i class="fas fa-user-plus"></i> Criar Conta
+							</a>
+							<hr class="dropdown-divider">
+						</div>
 
-            <div class="card-content">
-                <div class="cart-empty">
-                    <i class="fas fa-shopping-cart" style="font-size: 64px; color: var(--text-secondary);"></i>
-                    <p>Seu carrinho está vazio</p>
-                </div>
-            </div>
+						<!-- Admin: mostrar Área Administrativa -->
+						<div sec:authorize="hasRole('ADMIN')">
+							<a th:href="@{/admin}" class="dropdown-item">
+								<i class="fas fa-cogs"></i> Área Administrativa
+							</a>
+							<hr class="dropdown-divider">
+						</div>
 
-            <div class="card-footer" style="display: flex; justify-content: center; padding-bottom: 2rem;">
-                <div class="form-actions" style="gap: 1rem;">
-                    <a href="#produtos" class="btn btn-outline">
-                        <i class="fas fa-arrow-left"></i> Comprar Mais
-                    </a>
-                    <a th:href="@{/checkout}" class="btn btn-primary">
-                        <i class="fas fa-check"></i> Finalizar Pedido
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+						<form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()"
+						      style="margin:0;">
+						  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+						  <button type="submit" class="dropdown-item" style="width:100%; text-align:left; background:none; border:none;">
+						    <i class="fas fa-sign-out-alt"></i> Logout
+						  </button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</nav>
+	</header>
 
-<!-- Products -->
-<section class="products-section" id="produtos">
-    <div class="container">
-        <div class="section-header">
-            <h3>Nossos Produtos</h3>
-            <p>Explore nossa seleção cuidadosamente escolhida</p>
-        </div>
+	<!-- Hero -->
+	<section class="hero" id="home">
+		<div class="hero-container">
+			<h2>Sua Loja Online Completa</h2>
+			<p>Descubra produtos incríveis com os melhores preços e entrega rápida.</p>
+			<a href="#produtos" class="btn btn-primary">Ver Produtos</a>
+		</div>
+	</section>
 
-        <!-- ✅ Filtros (mantendo como buttons, pro JS filtrar sem reload) -->
-        <div class="categories-filter" id="categories-filter">
-            <button type="button" class="category-btn active" data-category="ALL">Todos</button>
-            <button type="button" class="category-btn" data-category="ELECTRONICS">Eletrônicos</button>
-            <button type="button" class="category-btn" data-category="CLOTHING">Roupas</button>
-            <button type="button" class="category-btn" data-category="HOME">Casa & Jardim</button>
-            <button type="button" class="category-btn" data-category="SPORTS">Esportes</button>
-        </div>
+	<!-- (Opcional) Carrinho - por enquanto escondido (igual original) -->
+	<section class="cart-section" style="display: none;" id="cart-section">
+		<div class="container">
+			<div class="admin-card">
+				<div class="card-header">
+					<h3>
+						<i class="fas fa-shopping-cart"></i>
+						Carrinho de Compras
+					</h3>
+				</div>
 
-        <!-- Grid -->
-        <div class="products-grid" id="products-grid">
+				<div class="card-content">
+					<div class="cart-empty">
+						<i class="fas fa-shopping-cart" style="font-size: 64px; color: var(--text-secondary);"></i>
+						<p>Seu carrinho está vazio</p>
+					</div>
+				</div>
 
-            <div class="product-card"
-                 th:each="product : ${products}"
-                 th:attr="data-category=${#strings.toUpperCase(#strings.trim(product.category))}">
-                <div class="product-image">
-                    <i class="fas fa-box"></i>
-                </div>
+				<div class="card-footer" style="display: flex; justify-content: center; padding-bottom: 2rem;">
+					<div class="form-actions" style="gap: 1rem;">
+						<a href="#produtos" class="btn btn-outline">
+							<i class="fas fa-arrow-left"></i> Comprar Mais
+						</a>
+						<a th:href="@{/checkout}" class="btn btn-primary">
+							<i class="fas fa-check"></i> Finalizar Pedido
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 
-                <div class="product-info">
-                    <h4 class="product-title" th:text="${product.name}">Nome do Produto</h4>
+	<!-- Products -->
+	<section class="products-section" id="produtos">
+		<div class="container">
+			<div class="section-header">
+				<h3>Nossos Produtos</h3>
+				<p>Explore nossa seleção cuidadosamente escolhida</p>
+			</div>
 
-                    <p class="product-description" th:text="${product.description}">
-                        Descrição do produto
-                    </p>
+			<!-- ✅ Filtros (mantendo como buttons, pro JS filtrar sem reload) -->
+			<div class="categories-filter" id="categories-filter">
+				<button type="button" class="category-btn active" data-category="ALL">Todos</button>
+				<button type="button" class="category-btn" data-category="ELECTRONICS">Eletrônicos</button>
+				<button type="button" class="category-btn" data-category="CLOTHING">Roupas</button>
+				<button type="button" class="category-btn" data-category="HOME">Casa & Jardim</button>
+				<button type="button" class="category-btn" data-category="SPORTS">Esportes</button>
+			</div>
 
-                    <div class="product-price"
-                         th:text="'R$ ' + ${#numbers.formatDecimal(product.price, 1, 'POINT', 2, 'COMMA')}">
-                        R$ 0,00
-                    </div>
+			<!-- Grid -->
+			<div class="products-grid" id="products-grid">
 
-                    <div class="product-actions">
-                        <a th:href="@{/product/{id}(id=${product.id})}"
-                           class="btn btn-outline btn-small">
-                            <i class="fas fa-eye"></i><br>Detalhe
-                        </a>
+				<div class="product-card" th:each="product : ${products}"
+					th:attr="data-category=${#strings.toUpperCase(#strings.trim(product.category))}">
+					<div class="product-image">
+						<i class="fas fa-box"></i>
+					</div>
 
-                        <a th:href="@{/?addToCart={id}(id=${product.id})}"
-                           class="btn btn-primary btn-small">
-                            <i class="fas fa-cart-plus"></i><br>Adicionar
-                        </a>
-                    </div>
-                </div>
-            </div>
+					<div class="product-info">
+						<h4 class="product-title" th:text="${product.name}">Nome do Produto</h4>
 
-            <div th:if="${#lists.isEmpty(products)}">
-                <p>Nenhum produto cadastrado.</p>
-            </div>
-        </div>
-    </div>
-</section>
+						<p class="product-description" th:text="${product.description}">
+							Descrição do produto
+						</p>
 
-<!-- Botão de tema -->
-<button class="theme-toggle" id="theme-toggle" title="Alternar tema" type="button">
-    <i class="fas fa-sun"></i>
-</button>
+						<div class="product-price"
+							th:text="'R$ ' + ${#numbers.formatDecimal(product.price, 1, 'POINT', 2, 'COMMA')}">
+							R$ 0,00
+						</div>
 
-<script th:src="@{/js/main.js}"></script>
+						<div class="product-actions">
+							<a th:href="@{/product/{id}(id=${product.id})}" class="btn btn-outline btn-small">
+								<i class="fas fa-eye"></i><br>Detalhe
+							</a>
+
+							<a th:href="@{/?addToCart={id}(id=${product.id})}" class="btn btn-primary btn-small">
+								<i class="fas fa-cart-plus"></i><br>Adicionar
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<div th:if="${#lists.isEmpty(products)}">
+					<p>Nenhum produto cadastrado.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Botão de tema -->
+	<button class="theme-toggle" id="theme-toggle" title="Alternar tema" type="button">
+		<i class="fas fa-sun"></i>
+	</button>
+
+	<script th:src="@{/js/main.js}"></script>
 </body>
+
 </html>

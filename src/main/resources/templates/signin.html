@@ -1,139 +1,165 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Baltazar</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<meta charset="UTF-8">
+	<link rel="icon" type="image/svg+xml"
+		      href="data:image/svg+xml,
+		<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'>
+		<path fill='%230f172a'
+		d='M0 176l288 112 288-112L288 64 0 176zm288 176L0 240v112l288 112 288-112V240L288 352z'/>
+		</svg>">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title th:text="${pageTitle}">Login - Baltazar</title>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css">
 	<link rel="stylesheet" th:href="@{/css/auth.css}" href="/css/auth.css">
 </head>
+
 <body>
-    <!-- Header Simplificado -->
-    <header class="header">
-        <nav class="nav-container">
-            <div class="logo">
-                <a href="index.html">
-                    <h1><i class="fas fa-shopping-bag"></i> E-commerce</h1>
-                </a>
-            </div>
-            <div class="user-actions">
-                <button class="theme-toggle" id="theme-toggle" title="Alternar tema">
-                    <i class="fas fa-sun"></i>
-                </button>
-            </div>
-        </nav>
-    </header>
 
-    <!-- Auth Container -->
-    <main class="auth-main">
-        <div class="auth-container">
-            <div class="auth-card">
-                <div class="auth-header">
-                    <h2><i class="fas fa-sign-in-alt"></i> Entrar na sua conta</h2>
-                    <p>Acesse sua conta para continuar comprando</p>
-                </div>
+	<!-- Header Simplificado -->
+	<header class="header">
+		<nav class="nav-container">
+			<div class="logo">
+				<a th:href="@{/}">
+					<h1>
+						<i class="fas fa-shopping-bag"></i>
+						<span th:text="${brandName}">E-commerce</span>
+					</h1>
+				</a>
+			</div>
 
-                <!-- Mensagem de erro (hidden by default) -->
-                <!-- ⚠️ THYMELEAF: Remover style="display: none;" e adicionar th:if="${error}" -->
-                <div class="alert alert-error" style="display: none;">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>Email ou senha incorretos</span>
-                </div>
+			<div class="user-actions">
+				<button class="theme-toggle" id="theme-toggle" title="Alternar tema" type="button">
+					<i class="fas fa-sun"></i>
+				</button>
+			</div>
+		</nav>
+	</header>
 
-                <br>
+	<!-- Auth Container -->
+	<main class="auth-main">
+		<div class="auth-container">
+			<div class="auth-card">
+				<div class="auth-header">
+					<h2><i class="fas fa-sign-in-alt"></i> Entrar na sua conta</h2>
+					<p>Acesse sua conta para continuar comprando</p>
+				</div>
 
-                <form class="auth-form" action="index.html" method="post">
-                    <div class="form-group">
-                        <label for="email">
-                            <i class="fas fa-envelope"></i> E-mail
-                        </label>
-                        <input type="email" id="email" name="email" required placeholder="seu@email.com">
-                    </div>
+				<div class="alert alert-success" th:if="${success}">
+					<i class="fas fa-check-circle"></i>
+					<span>Conta criada com sucesso! Agora faça login.</span>
+				</div>
 
-                    <div class="form-group">
-                        <label for="password">
-                            <i class="fas fa-lock"></i> Senha
-                        </label>
-                        <div class="password-field">
-                            <input type="password" id="password" name="password" required placeholder="Digite sua senha" minlength="8">
-                            <button type="button" class="password-toggle" id="password-toggle">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
+				<div class="alert alert-error" th:if="${error}">
+					<i class="fas fa-exclamation-circle"></i>
+					<span>Email ou senha incorretos</span>
+				</div>
 
-                    <div class="password-requirements" id="password-requirements">
-                        <p><i class="fas fa-info-circle"></i> Sua senha deve ter:</p>
-                        <ul>
-                            <li id="req-length"><i class="fas fa-times"></i> Pelo menos 8 caracteres</li>
-                            <li id="req-uppercase"><i class="fas fa-times"></i> Uma letra maiúscula</li>
-                            <li id="req-number"><i class="fas fa-times"></i> Um número</li>
-                            <li id="req-special"><i class="fas fa-times"></i> Um caractere especial</li>
-                        </ul>
-                    </div>
+				<form class="auth-form" th:action="@{/signin}" method="post">
+					<input type="hidden"
+					       th:name="${_csrf.parameterName}"
+					       th:value="${_csrf.token}" />
+					<div class="form-group">
+						<label for="email">
+							<i class="fas fa-envelope"></i> E-mail
+						</label>
+						<input type="email" id="email" name="email" required placeholder="seu@email.com">
+					</div>
 
-                    <div class="form-options">
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="remember" name="remember">
-                            <span class="checkmark"></span>
-                            Lembrar de mim
-                        </label>
-                        <a href="#" class="forgot-link">Esqueceu a senha?</a>
-                    </div>
+					<div class="form-group">
+						<label for="password">
+							<i class="fas fa-lock"></i> Senha
+						</label>
+						<div class="password-field">
+							<input type="password" id="password" name="password" required placeholder="Digite sua senha"
+								style="width: 100%;" minlength="8">
+							<button type="button" class="password-toggle" id="password-toggle">
+								<i class="fas fa-eye"></i>
+							</button>
+						</div>
+					</div>
+					<!--
+					<div class="password-requirements" id="password-requirements">
+						<p><i class="fas fa-info-circle"></i> Sua senha deve ter:</p>
+						<ul>
+							<li id="req-length"><i class="fas fa-times"></i> Pelo menos 8 caracteres</li>
+							<li id="req-uppercase"><i class="fas fa-times"></i> Uma letra maiúscula</li>
+							<li id="req-number"><i class="fas fa-times"></i> Um número</li>
+							<li id="req-special"><i class="fas fa-times"></i> Um caractere especial</li>
+						</ul>
+					</div>
+					-->
+					<div class="form-options">
+						<label class="checkbox-container">
+							<input type="checkbox" id="remember" name="remember">
+							<span class="checkmark"></span>
+							Lembrar de mim
+						</label>
+						<a th:href="@{/forgot-password}" class="forgot-link">Esqueceu a senha?</a>
+					</div>
 
-                    <button type="submit" class="btn btn-primary btn-auth">
-                        <i class="fas fa-sign-in-alt"></i> Entrar
-                    </button>
+					<button type="submit" class="btn btn-primary btn-auth">
+						<i class="fas fa-sign-in-alt"></i> Entrar
+					</button>
 
-                    <div class="divider">
-                        <span>ou</span>
-                    </div>
+					<div class="divider">
+						<span>ou</span>
+					</div>
 
-                    <div class="social-login">
-                        <button type="button" class="btn btn-social btn-google">
-                            <i class="fab fa-google"></i> Continuar com Google
-                        </button>
-                        <button type="button" class="btn btn-social btn-facebook">
-                            <i class="fab fa-facebook-f"></i> Continuar com Facebook
-                        </button>
-                    </div>
-                </form>
+					<div class="social-login">
+						<button type="button" class="btn btn-social btn-google">
+							<i class="fab fa-google"></i> Continuar com Google
+						</button>
+						<button type="button" class="btn btn-social btn-facebook">
+							<i class="fab fa-facebook-f"></i> Continuar com Facebook
+						</button>
+					</div>
+				</form>
 
-                <div class="auth-footer">
-                    <p>Não tem uma conta? <a href="signup.html" class="auth-link">Criar conta</a></p>
-                </div>
-            </div>
+				<div class="auth-footer">
+					<p>Não tem uma conta?
+						<a th:href="@{/signup}" class="auth-link">Criar conta</a>
+					</p>
+				</div>
+			</div>
 
-            <!-- Decorative Side -->
-            <div class="auth-side">
-                <div class="auth-side-content">
-                    <i class="fas fa-shopping-cart auth-side-icon"></i>
-                    <h3>Bem-vindo de volta!</h3>
-                    <p>Entre na sua conta e continue explorando nossos produtos incríveis. Suas compras estão te esperando!</p>
-                    <div class="auth-side-features">
-                        <div class="feature-item">
-                            <i class="fas fa-truck"></i>
-                            <span>Frete grátis acima de R$ 199</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Compra 100% segura</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-undo"></i>
-                            <span>Troca grátis em 30 dias</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+			<!-- Decorative Side -->
+			<div class="auth-side">
+				<div class="auth-side-content">
+					<i class="fas fa-shopping-cart auth-side-icon"></i>
+					<h3>Bem-vindo de volta!</h3>
+					<p>Entre na sua conta e continue explorando nossos produtos incríveis. Suas compras estão te
+						esperando!</p>
 
-   <script th:src="@{/js/main.js}" src="/js/main.js"></script>
-   <script th:src="@{/js/auth.js}" src="/js/auth.js"></script>
+					<div class="auth-side-features">
+						<div class="feature-item">
+							<i class="fas fa-truck"></i>
+							<span>Frete grátis acima de R$ 199</span>
+						</div>
+						<div class="feature-item">
+							<i class="fas fa-shield-alt"></i>
+							<span>Compra 100% segura</span>
+						</div>
+						<div class="feature-item">
+							<i class="fas fa-undo"></i>
+							<span>Troca grátis em 30 dias</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<script th:src="@{/js/main.js}" src="/js/main.js"></script>
+	<script th:src="@{/js/auth.js}" src="/js/auth.js"></script>
 </body>
+
 </html>

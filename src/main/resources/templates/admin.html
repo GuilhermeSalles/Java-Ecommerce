@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 	<meta charset="UTF-8">
+	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
+	<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'>
+	<path fill='%230f172a'
+	d='M0 176l288 112 288-112L288 64 0 176zm288 176L0 240v112l288 112 288-112V240L288 352z'/>
+	</svg>">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title th:text="${pageTitle}">Painel Administrativo - E-commerce Baltazar</title>
+	<title th:text="${pageTitle}">Painel Administrativo - Baltazar Store</title>
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,72 +19,116 @@
 	<link rel="stylesheet" th:href="@{/css/admin.css}">
 	<link rel="stylesheet" th:href="@{/css/auth.css}">
 
-	<style>
-		/* Pequenos ajustes de espaçamento sem “quebrar” seu CSS */
-		.admin-section { padding-bottom: 2rem; }
-		.admin-divider { height: 1px; background: var(--border-color); margin: 1.5rem 0; opacity: .9; }
-	</style>
 </head>
 
 <body>
+
 	<!-- Admin Header -->
 	<header class="admin-header">
-		<div class="admin-nav-container">
+		<nav class="admin-nav-container">
+
 			<div class="admin-logo">
-				<a th:href="@{/}">
-					<h1><i class="fas fa-shopping-bag"></i> <span th:text="${brandName}">E-commerce</span></h1>
+				<a th:href="@{/admin}">
+					<h1>
+						<i class="fas fa-shopping-bag"></i>
+						<span th:text="${brandName}">Baltazar Store</span>
+					</h1>
 				</a>
 				<span class="admin-badge">Admin</span>
 			</div>
 
 			<div class="admin-user-actions">
+
 				<button class="theme-toggle" id="theme-toggle" title="Alternar tema" type="button">
 					<i class="fas fa-sun"></i>
 				</button>
 
-				<div class="admin-user-info">
-					<i class="fas fa-user-shield"></i>
-					<span th:text="${adminName}">Admin</span>
+				<!-- Perfil (dropdown igual index) -->
+				<div class="dropdown">
+					<button class="btn btn-outline dropdown-toggle" id="profile-dropdown" type="button">
+
+						<!-- Avatar -->
+						<span class="profile-avatar" sec:authorize="isAuthenticated()">
+
+							<img th:if="${#authentication.principal.user.profileImageUrl != null}"
+								th:src="@{${#authentication.principal.user.profileImageUrl}}" class="avatar-img" />
+
+							<i class="fas fa-user-shield"
+								th:if="${#authentication.principal.user.profileImageUrl == null}">
+							</i>
+						</span>
+
+						<!-- Nome -->
+						<span sec:authorize="isAuthenticated()" th:text="${#authentication.principal.fullName}">
+						</span>
+
+						<i class="fas fa-chevron-down"></i>
+					</button>
+
+					<div class="dropdown-menu" id="dropdown-menu">
+
+						<!-- Voltar ao site (somente no admin) -->
+						<a th:href="@{/}" class="dropdown-item">
+							<i class="fas fa-arrow-left"></i> Voltar ao Site
+						</a>
+
+						<hr class="dropdown-divider">
+
+						<!-- Logout -->
+						<form th:action="@{/logout}" method="post" style="margin:0;">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+							<button type="submit" class="dropdown-item"
+								style="width:100%; text-align:left; background:none; border:none;">
+								<i class="fas fa-sign-out-alt"></i> Logout
+							</button>
+						</form>
+
+					</div>
 				</div>
 
-				<a th:href="@{/}" class="btn btn-outline btn-small">
-					<i class="fas fa-arrow-left"></i> Voltar ao Site
-				</a>
 			</div>
-		</div>
+		</nav>
 	</header>
 
-	<!-- Admin Layout -->
 	<div class="admin-layout">
 
 		<!-- Sidebar -->
 		<aside class="admin-sidebar">
 			<nav class="admin-nav">
 				<ul class="admin-nav-list">
+
 					<li class="admin-nav-item">
-						<a href="#dashboard" class="admin-nav-link active" data-section="dashboard">
+						<a class="admin-nav-link" th:href="@{/admin(section='dashboard')}"
+							th:classappend="${activeSection == 'dashboard'} ? ' active' : ''">
 							<i class="fas fa-tachometer-alt"></i>
 							<span>Dashboard</span>
 						</a>
 					</li>
+
 					<li class="admin-nav-item">
-						<a href="#produtos" class="admin-nav-link" data-section="products">
+						<a class="admin-nav-link" th:href="@{/admin(section='products')}"
+							th:classappend="${activeSection == 'products'} ? ' active' : ''">
 							<i class="fas fa-box"></i>
 							<span>Produtos</span>
 						</a>
 					</li>
+
 					<li class="admin-nav-item">
-						<a href="#pedidos" class="admin-nav-link" data-section="orders">
+						<a class="admin-nav-link" th:href="@{/admin(section='orders')}"
+							th:classappend="${activeSection == 'orders'} ? ' active' : ''">
 							<i class="fas fa-shopping-cart"></i>
 							<span>Pedidos</span>
 						</a>
 					</li>
+
 					<li class="admin-nav-item">
-						<a href="#usuarios" class="admin-nav-link" data-section="users">
+						<a class="admin-nav-link" th:href="@{/admin(section='users')}"
+							th:classappend="${activeSection == 'users'} ? ' active' : ''">
 							<i class="fas fa-users"></i>
 							<span>Usuários</span>
 						</a>
 					</li>
+
 				</ul>
 			</nav>
 		</aside>
@@ -88,18 +136,18 @@
 		<!-- Main Content -->
 		<main class="admin-main">
 
-			<!-- Dashboard -->
-			<section id="dashboard" class="admin-section active">
+			<!-- Dashboard (só renderiza se for a seção ativa) -->
+			<section id="dashboard" class="admin-section" th:if="${activeSection == 'dashboard'}">
 				<div class="admin-header-section">
-					<h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
-					<p>Visão geral do sistema</p>
+					<div class="left">
+						<h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+						<p>Visão geral do sistema</p>
+					</div>
 				</div>
 
 				<div class="stats-grid">
 					<div class="stat-card">
-						<div class="stat-icon">
-							<i class="fas fa-box text-primary"></i>
-						</div>
+						<div class="stat-icon"><i class="fas fa-box text-primary"></i></div>
 						<div class="stat-content">
 							<h3 th:text="${totalProducts}">0</h3>
 							<p>Total de Produtos</p>
@@ -107,9 +155,7 @@
 					</div>
 
 					<div class="stat-card">
-						<div class="stat-icon">
-							<i class="fas fa-users text-success"></i>
-						</div>
+						<div class="stat-icon"><i class="fas fa-users text-success"></i></div>
 						<div class="stat-content">
 							<h3 th:text="${totalUsers}">0</h3>
 							<p>Usuários Cadastrados</p>
@@ -117,9 +163,7 @@
 					</div>
 
 					<div class="stat-card">
-						<div class="stat-icon">
-							<i class="fas fa-shopping-cart text-warning"></i>
-						</div>
+						<div class="stat-icon"><i class="fas fa-shopping-cart text-warning"></i></div>
 						<div class="stat-content">
 							<h3 th:text="${totalOrders}">0</h3>
 							<p>Pedidos Realizados</p>
@@ -127,11 +171,10 @@
 					</div>
 
 					<div class="stat-card">
-						<div class="stat-icon">
-							<i class="fas fa-dollar-sign text-success"></i>
-						</div>
+						<div class="stat-icon"><i class="fas fa-dollar-sign text-success"></i></div>
 						<div class="stat-content">
-							<h3 th:text="'R$ ' + ${#numbers.formatDecimal(totalSales, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h3>
+							<h3 th:text="'R$ ' + ${#numbers.formatDecimal(totalSales, 1, 'POINT', 2, 'COMMA')}">R$ 0,00
+							</h3>
 							<p>Total em Vendas</p>
 						</div>
 					</div>
@@ -142,8 +185,55 @@
 						<div class="card-header">
 							<h3>Pedidos Recentes</h3>
 						</div>
+
 						<div class="card-content">
-							<p style="opacity:.8">Em breve: lista dinâmica de pedidos.</p>
+
+							<div th:if="${#lists.isEmpty(recentOrders)}" style="opacity:.8">
+								Nenhum pedido registrado ainda.
+							</div>
+
+							<div th:if="${!#lists.isEmpty(recentOrders)}">
+								<table class="admin-table">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Cliente</th>
+											<th>Status</th>
+											<th>Pago</th>
+											<th>Valor</th>
+											<th>Data</th>
+										</tr>
+									</thead>
+
+									<tbody>
+										<tr th:each="o : ${recentOrders}">
+											<td th:text="${o.id}">1</td>
+											<td th:text="${o.customerName}">Cliente</td>
+
+											<td>
+												<span class="badge" th:text="${o.shippingStatus}">
+												</span>
+											</td>
+
+											<td>
+												<span class="badge" th:text="${o.paid ? 'SIM' : 'NÃO'}"
+													th:classappend="${o.paid} ? ' badge--ACTIVE' : ' badge--INACTIVE'">
+												</span>
+											</td>
+
+											<td
+												th:text="'R$ ' + ${#numbers.formatDecimal(o.totalAmount, 1, 'POINT', 2, 'COMMA')}">
+												R$ 0,00
+											</td>
+
+											<td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">
+												00/00/0000
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
 						</div>
 					</div>
 
@@ -151,80 +241,122 @@
 						<div class="card-header">
 							<h3>Produtos Mais Vendidos</h3>
 						</div>
+
 						<div class="card-content">
-							<p style="opacity:.8">Em breve: ranking dinâmico.</p>
+							<div th:if="${#lists.isEmpty(topProducts)}" style="opacity:.8">
+								Ainda não há vendas pagas para gerar ranking.
+							</div>
+
+							<div th:if="${!#lists.isEmpty(topProducts)}" class="top-products">
+								<table class="admin-table">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>Produto</th>
+											<th>Qtd</th>
+											<th>Faturamento</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="tp,iter : ${topProducts}">
+											<td th:text="${iter.count}">1</td>
+											<td th:text="${tp.productName}">Produto</td>
+											<td th:text="${tp.totalQuantity}">0</td>
+											<td
+												th:text="'R$ ' + ${#numbers.formatDecimal(tp.totalRevenue, 1, 'POINT', 2, 'COMMA')}">
+												R$ 0,00
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 				</div>
 			</section>
 
-			<!-- Produtos -->
-			<section id="products" class="admin-section">
+			<!-- Products -->
+			<section id="products" class="admin-section" th:if="${activeSection == 'products'}">
 				<div class="admin-header-section">
-					<h2><i class="fas fa-box"></i> Gestão de Produtos</h2>
-					<a th:href="@{/admin}" class="btn btn-primary" id="add-produto-btn">
+					<div class="left">
+						<h2><i class="fas fa-box"></i> Gestão de Produtos</h2>
+						<p>Cadastre, edite e filtre produtos</p>
+					</div>
+
+					<a th:href="@{/admin(section='products')}" class="btn btn-primary" id="add-produto-btn">
 						<i class="fas fa-plus"></i> Adicionar Produto
 					</a>
 				</div>
 
-				<!-- Form -->
-				<form id="produto-form" class="form-grid two-columns" th:action="@{/admin}" method="POST">
-					<input type="hidden" name="id" value="">
+				<form id="produto-form" class="form-grid two-columns" th:action="@{/admin/product/save}" method="POST"
+					th:attr="data-mode=${formMode}">
+
+					<input type="hidden" id="produto-id" name="id" th:value="${productForm.id}">
 
 					<div class="form-group">
 						<label for="produto-nome">Nome do Produto</label>
-						<input type="text" id="produto-nome" name="name" required>
+						<input type="text" id="produto-nome" name="name" placeholder="Digite o nome do produto."
+							required th:value="${productForm.name}">
 					</div>
 
 					<div class="form-group">
 						<label for="produto-categoria">Categoria</label>
 						<select id="produto-categoria" name="category" required>
 							<option value="">Selecione uma categoria</option>
-							<option value="ELECTRONICS">Eletrônicos</option>
-							<option value="CLOTHING">Roupas</option>
-							<option value="HOME">Casa & Jardim</option>
-							<option value="SPORTS">Esportes</option>
+							<option value="ELECTRONICS" th:selected="${productForm.category == 'ELECTRONICS'}">
+								Eletrônicos</option>
+							<option value="CLOTHING" th:selected="${productForm.category == 'CLOTHING'}">Roupas</option>
+							<option value="HOME" th:selected="${productForm.category == 'HOME'}">Casa & Jardim</option>
+							<option value="SPORTS" th:selected="${productForm.category == 'SPORTS'}">Esportes</option>
 						</select>
 					</div>
 
+					<!-- preço com máscara (visível) + hidden name=price -->
 					<div class="form-group">
-						<label for="produto-preco">Preço</label>
-						<input type="number" id="produto-preco" name="price" step="0.01" value="0" required>
+						<label for="produto-preco-mask">Preço</label>
+						<input type="text" id="produto-preco-mask" inputmode="numeric" autocomplete="off"
+							placeholder="R$ 0,00" required>
+						<input type="hidden" id="produto-preco" name="price"
+							th:value="${productForm.price != null ? productForm.price : '0.00'}">
 					</div>
 
 					<div class="form-group">
 						<label for="produto-estado">Estado</label>
 						<select id="produto-estado" name="state" required>
-							<option value="ACTIVE">Ativo</option>
-							<option value="INACTIVE">Inativo</option>
+							<option value="ACTIVE" th:selected="${productForm.state == 'ACTIVE'}">Ativo</option>
+							<option value="INACTIVE" th:selected="${productForm.state == 'INACTIVE'}">Inativo</option>
 						</select>
 					</div>
 
 					<div class="form-group full-width">
 						<label for="produto-descricao">Descrição</label>
-						<textarea id="produto-descricao" name="description" rows="4" required></textarea>
+						<textarea id="produto-descricao" name="description" rows="4" required
+							th:text="${productForm.description}"
+							placeholder="Digite a descrição do produto."></textarea>
 					</div>
 
 					<div class="form-actions">
-						<button type="button" class="btn btn-outline btn-form">
+						<button type="button" class="btn btn-outline btn-form" id="produto-cancelar-btn">
 							<i class="fas fa-times"></i> Cancelar
 						</button>
+
 						<button type="submit" class="btn btn-primary btn-form">
-							<i class="fas fa-save"></i> Salvar
+							<i class="fas fa-save"></i>
+							<span th:text="${formMode == 'edit' ? 'Atualizar' : 'Salvar'}">Salvar</span>
 						</button>
 					</div>
 				</form>
 
 				<div class="admin-divider"></div>
 
-				<!-- Filters -->
-				<div class="admin-filters" id="produtos">
+				<div class="admin-filters">
 					<div class="filter-group">
 						<input type="text" id="search-produtos" placeholder="Buscar produtos..." class="admin-input">
 
 						<select id="filter-categoria" class="admin-select">
 							<option value="" th:selected="${selectedCategory == ''}">Todas as categorias</option>
-							<option value="ELECTRONICS" th:selected="${selectedCategory == 'ELECTRONICS'}">Eletrônicos</option>
+							<option value="ELECTRONICS" th:selected="${selectedCategory == 'ELECTRONICS'}">Eletrônicos
+							</option>
 							<option value="CLOTHING" th:selected="${selectedCategory == 'CLOTHING'}">Roupas</option>
 							<option value="HOME" th:selected="${selectedCategory == 'HOME'}">Casa & Jardim</option>
 							<option value="SPORTS" th:selected="${selectedCategory == 'SPORTS'}">Esportes</option>
@@ -232,7 +364,6 @@
 					</div>
 				</div>
 
-				<!-- Table -->
 				<div class="admin-table-container">
 					<table class="admin-table" id="produtos-table">
 						<thead>
@@ -252,17 +383,28 @@
 								<td th:text="${p.id}">1</td>
 								<td th:text="${p.name}">Produto</td>
 								<td th:text="${p.category}">ELECTRONICS</td>
-								<td th:text="'R$ ' + ${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
-								<td th:text="${p.state}">ACTIVE</td>
+								<td th:text="'R$ ' + ${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">R$ 0,00
+								</td>
+								<td>
+									<span class="badge" th:text="${#strings.toUpperCase(#strings.trim(p.state))}"
+										th:classappend="${#strings.toUpperCase(#strings.trim(p.state)) == 'ACTIVE'} ? ' badge--ACTIVE' : ' badge--INACTIVE'">
+									</span>
+								</td>
 
 								<td class="action-buttons">
-									<a th:href="@{/admin/product/edit/{id}(id=${p.id})}" class="btn-icon btn-edit" title="Editar">
+									<a th:href="@{/admin/product/edit/{id}(id=${p.id})}" class="btn-icon btn-edit"
+										title="Editar">
 										<i class="fas fa-edit"></i>
 									</a>
-									<a th:href="@{/admin/product/delete/{id}(id=${p.id})}" class="btn-icon btn-delete" title="Excluir">
+
+									<!--  agora abre modal -->
+									<a th:href="@{/admin/product/delete/{id}(id=${p.id})}" class="btn-icon btn-delete"
+										title="Excluir"
+										th:attr="data-id=${p.id},data-name=${p.name},data-category=${p.category},data-price=${p.price}">
 										<i class="fas fa-trash"></i>
 									</a>
 								</td>
+
 							</tr>
 
 							<tr th:if="${#lists.isEmpty(products)}">
@@ -273,21 +415,276 @@
 				</div>
 			</section>
 
-			<!-- Usuários -->
-			<section id="usuarios" class="admin-section">
+			<!-- Orders -->
+			<section id="orders" class="admin-section" th:if="${activeSection == 'orders'}">
 				<div class="admin-header-section">
-					<h2><i class="fas fa-users"></i> Gestão de Usuários</h2>
-					<p style="opacity:.8">Em breve: lista dinâmica de usuários.</p>
+					<div class="left">
+						<h2><i class="fas fa-shopping-cart"></i> Gestão de Pedidos</h2>
+						<p>Visualize e acompanhe os pedidos realizados na loja</p>
+					</div>
+				</div>
+
+				<div class="admin-card">
+					<div class="card-header">
+						<h3>Pedidos</h3>
+					</div>
+
+					<div class="card-content">
+						<div class="admin-table-container" style="margin-top:1rem;">
+							<table class="admin-table" id="pedidos-table">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Cliente</th>
+										<th>Status</th>
+										<th>Pago</th>
+										<th>Valor</th>
+										<th>Data</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									<tr th:each="o : ${orders}">
+										<td th:text="${o.id}">1</td>
+
+										<td>
+											<div style="display:flex; flex-direction:column; gap:.15rem;">
+												<strong th:text="${o.customerName}">Cliente</strong>
+												<small style="opacity:.75"
+													th:text="${o.customerEmail}">email@exemplo.com</small>
+											</div>
+										</td>
+
+										<td>
+											<span class="badge" th:text="${o.shippingStatus}" th:classappend="${o.shippingStatus == 'DELIVERED'} ? ' badge--success' :
+											                      (${o.shippingStatus == 'SHIPPED'} ? ' badge--warning' : ' badge--muted')">
+												PLACED
+											</span>
+										</td>
+
+										<td>
+											<span class="badge" th:text="${o.paid} ? 'Pago' : 'Não pago'"
+												th:classappend="${o.paid} ? ' badge--success' : ' badge--muted'">
+												Pago
+											</span>
+										</td>
+
+										<td
+											th:text="'R$ ' + ${#numbers.formatDecimal(o.totalAmount, 1, 'POINT', 2, 'COMMA')}">
+											R$ 0,00
+										</td>
+
+										<td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">
+											19/02/2026 10:00
+										</td>
+									</tr>
+
+									<tr th:if="${#lists.isEmpty(orders)}">
+										<td colspan="6" style="text-align:center;">
+											Nenhum pedido para exibir.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<p style="opacity:.75; margin-top: .75rem;">
+							* Em breve: ações (detalhes/cancelar) e filtros por status.
+						</p>
+					</div>
 				</div>
 			</section>
 
-			<!-- Pedidos -->
-			<section id="pedidos" class="admin-section">
+			<!-- Users -->
+			<section id="users" class="admin-section" th:if="${activeSection == 'users'}">
 				<div class="admin-header-section">
-					<h2><i class="fas fa-shopping-cart"></i> Gestão de Pedidos</h2>
-					<p style="opacity:.8">Em breve: lista dinâmica de pedidos.</p>
+					<div class="left">
+						<h2><i class="fas fa-users"></i> Gestão de Usuários</h2>
+						<p>Cadastre, edite, filtre e remova usuários</p>
+					</div>
+
+					<a th:href="@{/admin(section='users', userStatus=${selectedUserStatus})}" class="btn btn-primary">
+						<i class="fas fa-plus"></i> Adicionar Usuário
+					</a>
+				</div>
+
+				<!-- FORM (create/edit) -->
+				<form id="user-form" class="form-grid two-columns" th:action="@{/admin/user/save}" method="POST"
+					th:attr="data-mode=${formModeUser}">
+
+					<input type="hidden" name="id" th:value="${userForm.id}">
+
+					<div class="form-group">
+						<label>Nome</label>
+						<input type="text" name="firstName" required placeholder="Nome"
+							th:value="${userForm.firstName}">
+					</div>
+
+					<div class="form-group">
+						<label>Sobrenome</label>
+						<input type="text" name="lastName" required placeholder="Sobrenome"
+							th:value="${userForm.lastName}">
+					</div>
+
+					<div class="form-group">
+						<label>Email</label>
+						<input type="email" name="email" required placeholder="email@exemplo.com"
+							th:value="${userForm.email}">
+					</div>
+
+					<div class="form-group">
+						<label>Telefone</label>
+						<input type="text" name="phone" required placeholder="(11) 99999-9999"
+							th:value="${userForm.phone}">
+					</div>
+
+					<div class="form-group">
+						<label>Status</label>
+						<select name="statusUsuario" required>
+							<option th:each="st : ${statusUsuarioOptions}" th:value="${st.name()}"
+								th:text="${st.name()}"
+								th:selected="${userForm.statusUsuario != null and userForm.statusUsuario.name() == st.name()}">
+							</option>
+						</select>
+					</div>
+
+					<!-- Senha: no EDIT é opcional (se preencher, atualiza) -->
+					<div class="form-group">
+						<label>Senha <small style="opacity:.7">(opcional ao editar)</small></label>
+						<input type="password" name="password" minlength="8" placeholder="Nova senha (opcional)">
+					</div>
+
+					<div class="form-group">
+						<label>Confirmar senha</label>
+						<input type="password" name="confirmPassword" minlength="8" placeholder="Confirmar nova senha">
+					</div>
+
+					<div class="form-actions full-width">
+						<a class="btn btn-outline btn-form"
+							th:href="@{/admin(section='users', userStatus=${selectedUserStatus})}">
+							<i class="fas fa-times"></i> Cancelar
+						</a>
+
+						<button type="submit" class="btn btn-primary btn-form">
+							<i class="fas fa-save"></i>
+							<span th:text="${formModeUser == 'edit' ? 'Atualizar' : 'Salvar'}">Salvar</span>
+						</button>
+					</div>
+				</form>
+
+				<div class="admin-divider"></div>
+
+				<!-- FILTROS (igual products, mas por enum) -->
+				<div class="admin-filters">
+					<div class="filter-group">
+						<input type="text" id="search-users" placeholder="Buscar usuários..." class="admin-input">
+
+						<select id="filter-user-status" class="admin-select">
+							<option value="" th:selected="${selectedUserStatus == ''}">Todos os status</option>
+							<option th:each="st : ${statusUsuarioOptions}" th:value="${st.name()}"
+								th:text="${st.name()}" th:selected="${selectedUserStatus == st.name()}">
+							</option>
+						</select>
+					</div>
+				</div>
+
+				<!-- TABELA -->
+				<div class="admin-table-container">
+					<table class="admin-table" id="users-table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Nome</th>
+								<th>Email</th>
+								<th>Status</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr th:if="${#lists.isEmpty(users)}">
+								<td colspan="5" style="text-align:center;">Nenhum usuário para exibir.</td>
+							</tr>
+
+							<tr th:each="u : ${users}"
+								th:attr="data-status=${u.statusUsuario != null ? u.statusUsuario.name() : ''}">
+								<td th:text="${u.id}">1</td>
+								<td th:text="${u.firstName + ' ' + u.lastName}">Nome</td>
+								<td th:text="${u.email}">email@exemplo.com</td>
+								<td>
+									<span class="badge" th:text="${u.statusUsuario}"
+										th:classappend="${u.statusUsuario != null} ? ' badge--' + ${u.statusUsuario.name()} : ''">
+									</span>
+								</td>
+
+								<td class="action-buttons">
+									<a th:href="@{/admin/user/edit/{id}(id=${u.id}, userStatus=${selectedUserStatus})}"
+										class="btn-icon btn-edit" title="Editar">
+										<i class="fas fa-edit"></i>
+									</a>
+
+									<a th:href="@{/admin/user/delete/{id}(id=${u.id})}" class="btn-icon btn-delete"
+										title="Excluir" onclick="return confirm('Deseja excluir este usuário?');">
+										<i class="fas fa-trash"></i>
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</section>
+
+			<!-- =========================
+			     MODAL: CONFIRMAR EXCLUSÃO
+			     ========================= -->
+			<div class="modal-overlay" id="delete-modal" aria-hidden="true">
+				<div class="admin-card modal-card" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+					<div class="card-header">
+						<h3 id="delete-modal-title">
+							<i class="fas fa-exclamation-triangle text-warning"></i>
+							Excluir Produto
+						</h3>
+					</div>
+
+					<div class="card-content">
+						<div class="delete-confirmation">
+							<div class="warning-icon">
+								<i class="fas fa-exclamation-triangle"></i>
+							</div>
+
+							<h2>Confirmar Exclusão</h2>
+							<p>Tem certeza que deseja excluir o produto:</p>
+
+							<h4 class="product-name-highlight" id="delete-product-name">Produto</h4>
+
+							<p class="warning-text">
+								Esta ação não poderá ser desfeita.
+							</p>
+
+							<div style="opacity:.9; margin-top: .75rem;">
+								<small><strong>ID:</strong> <span id="delete-product-id">-</span></small><br>
+								<small><strong>Categoria:</strong> <span
+										id="delete-product-category">-</span></small><br>
+								<small><strong>Preço:</strong> R$ <span id="delete-product-price">0,00</span></small>
+							</div>
+						</div>
+					</div>
+
+					<div class="card-footer delete-footer"
+						style="display:flex; justify-content:center; padding-bottom: 1.25rem;">
+						<div class="form-actions" style="gap: 1rem;">
+							<button type="button" class="btn btn-outline" id="delete-cancel-btn">
+								<i class="fas fa-times"></i> Cancelar
+							</button>
+
+							<!--  confirma indo para a rota /admin/product/delete/{id} -->
+							<a href="#" class="btn btn-danger" id="delete-confirm-btn">
+								<i class="fas fa-trash"></i> Excluir
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
 
 		</main>
 	</div>
@@ -295,50 +692,53 @@
 	<script th:src="@{/js/main.js}"></script>
 	<script th:src="@{/js/admin.js}"></script>
 
-	<!-- Navegação do Sidebar + filtro select (client-side) -->
-	<script>
+	<!-- mantém seu filtro por select (products) -->
+	<script th:if="${activeSection == 'products'}">
 		document.addEventListener('DOMContentLoaded', function () {
-			// Sidebar navigation
-			const links = document.querySelectorAll('.admin-nav-link');
-			const sections = document.querySelectorAll('.admin-section');
+			const select = document.getElementById('filter-categoria');
+			if (!select) return;
 
-			function showSection(sectionId) {
-				sections.forEach(s => s.classList.remove('active'));
-				links.forEach(l => l.classList.remove('active'));
-
-				const target = document.getElementById(sectionId);
-				if (target) target.classList.add('active');
-
-				const activeLink = document.querySelector('.admin-nav-link[data-section="' + sectionId + '"]');
-				if (activeLink) activeLink.classList.add('active');
-			}
-
-			links.forEach(link => {
-				link.addEventListener('click', (e) => {
-					e.preventDefault();
-					const sectionId = link.dataset.section;
-					if (sectionId) showSection(sectionId);
+			select.addEventListener('change', () => {
+				const selected = (select.value || '').trim().toUpperCase();
+				const rows = document.querySelectorAll('#produtos-table tbody tr[data-category]');
+				rows.forEach(row => {
+					const rowCat = (row.getAttribute('data-category') || '').trim().toUpperCase();
+					row.style.display = (selected === '' || rowCat === selected) ? '' : 'none';
 				});
 			});
 
-			// Categoria select filter (Tabela produtos)
-			const select = document.getElementById('filter-categoria');
-			if (select) {
-				select.addEventListener('change', () => {
-					const selected = (select.value || '').trim().toUpperCase();
-					const rows = document.querySelectorAll('#produtos-table tbody tr[data-category]');
-
-					rows.forEach(row => {
-						const rowCat = (row.getAttribute('data-category') || '').trim().toUpperCase();
-						const show = selected === '' || rowCat === selected;
-						row.style.display = show ? '' : 'none';
-					});
-				});
-
-				select.dispatchEvent(new Event('change'));
-			}
+			select.dispatchEvent(new Event('change'));
 		});
 	</script>
+
+	<script th:if="${activeSection == 'users'}">
+		document.addEventListener('DOMContentLoaded', function () {
+			const statusSelect = document.getElementById('filter-user-status');
+			const searchInput = document.getElementById('search-users');
+			const rows = document.querySelectorAll('#users-table tbody tr[data-status]');
+
+			function applyFilters() {
+				const status = (statusSelect?.value || '').trim().toUpperCase();
+				const q = (searchInput?.value || '').trim().toLowerCase();
+
+				rows.forEach(row => {
+					const rowStatus = (row.getAttribute('data-status') || '').trim().toUpperCase();
+					const text = (row.innerText || '').toLowerCase();
+
+					const okStatus = (status === '' || rowStatus === status);
+					const okSearch = (q === '' || text.includes(q));
+
+					row.style.display = (okStatus && okSearch) ? '' : 'none';
+				});
+			}
+
+			if (statusSelect) statusSelect.addEventListener('change', applyFilters);
+			if (searchInput) searchInput.addEventListener('input', applyFilters);
+
+			applyFilters();
+		});
+	</script>
+
 </body>
 
 </html>

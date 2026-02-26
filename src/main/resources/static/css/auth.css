@@ -450,8 +450,8 @@
     font-size: 1rem;
     font-weight: 500;
     background: #fff0f0;
-    border: 1px solid #ffb3b3;
-    color: #b71c1c;
+	border: 1px solid #b3ffc8;
+	color: #1cb72e;
     display: flex;
     align-items: center;
     gap: 0.75rem;
