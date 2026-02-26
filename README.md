@@ -1,4 +1,4 @@
-# Ecommerce - Baltazar Store
+# 🛒 Ecommerce - Baltazar Store
 
 > Projeto de e-commerce moderno, seguro e escalável, desenvolvido com Spring Boot, Java 21, Thymeleaf, PostgreSQL (via Docker) e seguindo as melhores práticas de arquitetura e desenvolvimento.
 
@@ -119,10 +119,8 @@ src/
 
 ## 👨‍💻 Sobre o Autor
 
-Desenvolvido por [Guilherme Salles](https://www.linkedin.com/in/guilhermesalles/)
+## 👤 Autor Java Full Stack Developer
+**Guilherme Baltazar Vericimo de Sales**
 
----
-
-## 📄 Licença
-
-MIT
+<a href="https://www.linkedin.com/in/guilherme-baltazar-0028361a1" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
+<a href="https://instagram.com/yguilhermeb" target="_blank"><img src="https://img.shields.io/badge/-Instagram-%23E4405F?style=for-the-badge&logo=instagram&logoColor=white" target="_blank"></a>
