@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -62,77 +63,98 @@ public class AdminController {
 	 * @return Template admin.html
 	 */
 	@GetMapping("/admin")
-	public String admin(@RequestParam(name = "section", required = false, defaultValue = "dashboard") String section,
-			@RequestParam(name = "category", required = false) String category,
-			@RequestParam(name = "userStatus", required = false) String userStatus, Model model) {
-		String activeSection = normalizeSection(section);
+	public String admin(
+	        @RequestParam(name = "section", required = false, defaultValue = "dashboard") String section,
+	        @RequestParam(name = "category", required = false) String category,
+	        @RequestParam(name = "userStatus", required = false) String userStatus,
 
-		model.addAttribute("pageTitle", "Painel Administrativo - Baltazar Store");
-		model.addAttribute("brandName", "Baltazar Store");
-		model.addAttribute("adminName", "Admin");
+	        // ===== PAGINAÇÃO PRODUTOS =====
+	        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+	        @RequestParam(name = "size", required = false, defaultValue = "10") int size,
 
-		model.addAttribute("activeSection", activeSection);
+	        Model model) {
 
-		// Produtos (ordenado por id)
-		List<Product> products = productRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
-		model.addAttribute("products", products);
-		model.addAttribute("totalProducts", products.size());
+	    String activeSection = normalizeSection(section);
 
-		model.addAttribute("selectedCategory", category == null ? "" : category.trim().toUpperCase());
+	    model.addAttribute("pageTitle", "Painel Administrativo - Baltazar Store");
+	    model.addAttribute("brandName", "Baltazar Store");
+	    model.addAttribute("adminName", "Admin");
+	    model.addAttribute("activeSection", activeSection);
 
-		// Pedidos
-		List<Order> orders = orderRepository.findAll();
-		model.addAttribute("orders", orders);
-		model.addAttribute("totalOrders", orders.size());
+	    // =========================
+	    // PRODUCTS (PAGINADO + ordenado por id)
+	    // =========================
+	    String selectedCategory = (category == null) ? "" : category.trim().toUpperCase();
+	    model.addAttribute("selectedCategory", selectedCategory);
 
-		// Total em vendas = soma dos pedidos pagos
-		BigDecimal totalSales = orders.stream().filter(Order::isPaid)
-				.map(o -> o.getTotalAmount() == null ? BigDecimal.ZERO : o.getTotalAmount())
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	    int safePage = Math.max(page, 0);
+	    int safeSize = (size <= 0) ? 10 : size;
 
-		model.addAttribute("totalSales", totalSales);
-		
-		var recentOrders = orderRepository
-		        .findAllByOrderByCreatedAtDesc(PageRequest.of(0, 5));
+	    PageRequest pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "id"));
 
-		model.addAttribute("recentOrders", recentOrders);
+	    Page<Product> productPage;
+	    if (!selectedCategory.isEmpty()) {
+	        productPage = productRepository.findByCategoryIgnoreCase(selectedCategory, pageable);
+	    } else {
+	        productPage = productRepository.findAll(pageable);
+	    }
 
-		var topProducts = orderItemRepository.findTopSellingProducts(PageRequest.of(0, 5));
-		model.addAttribute("topProducts", topProducts);
+	    model.addAttribute("productPage", productPage);
+	    model.addAttribute("products", productPage.getContent());
+	    model.addAttribute("totalProducts", productPage.getTotalElements());
 
-		// TOTAL USERS (para o dashboard)
-		model.addAttribute("totalUsers", (int) userRepository.count());
+	    // =========================
+	    // ORDERS
+	    // =========================
+	    List<Order> orders = orderRepository.findAll();
+	    model.addAttribute("orders", orders);
+	    model.addAttribute("totalOrders", orders.size());
 
-		// Form padrão Produtos
-		model.addAttribute("formMode", "create");
-		model.addAttribute("productForm", new Product());
+	    BigDecimal totalSales = orders.stream()
+	            .filter(Order::isPaid)
+	            .map(o -> o.getTotalAmount() == null ? BigDecimal.ZERO : o.getTotalAmount())
+	            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-		// ===== USERS =====
-		model.addAttribute("statusUsuarioOptions", StatusUsuario.values());
+	    model.addAttribute("totalSales", totalSales);
 
-		// Form padrão Users
-		model.addAttribute("formModeUser", "create");
-		model.addAttribute("userForm", new User()); // usado só para first/last/email/phone/status (não usa hash no
-													// form)
+	    var recentOrders = orderRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, 5));
+	    model.addAttribute("recentOrders", recentOrders);
 
-		if ("users".equals(activeSection)) {
-			StatusUsuario parsedStatus = parseStatusUsuario(userStatus);
-			model.addAttribute("selectedUserStatus", parsedStatus == null ? "" : parsedStatus.name());
+	    var topProducts = orderItemRepository.findTopSellingProducts(PageRequest.of(0, 5));
+	    model.addAttribute("topProducts", topProducts);
 
-			List<User> users;
-			if (parsedStatus != null) {
-				users = userRepository.findByStatusUsuario(parsedStatus, Sort.by(Sort.Direction.ASC, "id"));
-			} else {
-				users = userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
-			}
+	    // TOTAL USERS (para o dashboard)
+	    model.addAttribute("totalUsers", (int) userRepository.count());
 
-			model.addAttribute("users", users);
-		} else {
-			model.addAttribute("users", Collections.emptyList());
-			model.addAttribute("selectedUserStatus", "");
-		}
+	    // Form padrão Produtos
+	    model.addAttribute("formMode", "create");
+	    model.addAttribute("productForm", new Product());
 
-		return "admin";
+	    // =========================
+	    // USERS
+	    // =========================
+	    model.addAttribute("statusUsuarioOptions", StatusUsuario.values());
+	    model.addAttribute("formModeUser", "create");
+	    model.addAttribute("userForm", new User());
+
+	    if ("users".equals(activeSection)) {
+	        StatusUsuario parsedStatus = parseStatusUsuario(userStatus);
+	        model.addAttribute("selectedUserStatus", parsedStatus == null ? "" : parsedStatus.name());
+
+	        List<User> users;
+	        if (parsedStatus != null) {
+	            users = userRepository.findByStatusUsuario(parsedStatus, Sort.by(Sort.Direction.ASC, "id"));
+	        } else {
+	            users = userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+	        }
+
+	        model.addAttribute("users", users);
+	    } else {
+	        model.addAttribute("users", Collections.emptyList());
+	        model.addAttribute("selectedUserStatus", "");
+	    }
+
+	    return "admin";
 	}
 
 	// =========================

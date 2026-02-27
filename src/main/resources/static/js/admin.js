@@ -1,25 +1,22 @@
 // ====================================
-// ADMIN (ONLY WHAT IS USED)
+// ADMIN (HARDENED - NO INFINITE RELOAD)
 // - Theme toggle
-// - Product table search + category filter
-// - Pagination + page size (10/20/50/100)
+// - Products: local search + server-side nav (category/size -> page=0) WITHOUT form.submit
 // - Money input mask + validation (> 0)
 // - Reset form on "Adicionar Produto" / "Cancelar"
 // - Delete modal (products)
 // ====================================
 
 document.addEventListener('DOMContentLoaded', function () {
+  // --- DEBUG: se isso aparecer duas vezes no console, seu JS está sendo carregado 2x ---
+  // Descomente pra testar:
+  // console.log('[admin.js] loaded', new Date().toISOString());
+
   setupThemeToggle();
-
-  // filtros + paginação
-  setupProductsTableUI();
-
-  // form
+  setupProductsTableUI(); // Pageable server-side (link navigation)
   initMoneyInput();
   bindProductFormActions();
   syncPriceMaskFromHidden();
-
-  // delete modal
   setupDeleteModal();
 });
 
@@ -56,183 +53,106 @@ function updateThemeIcon(theme) {
 }
 
 // =======================
-// PRODUCTS TABLE UI
-// - search (#search-produtos)
-// - category select (#filter-categoria)
-// - page size (#page-size)
-// - pagination container (#table-pagination)
+// PRODUCTS TABLE UI (SERVER-SIDE PAGEABLE)
+// HTML you have (confirmed):
+// - form#products-filter-form (GET /admin)
+// - input#page-input name="page"
+// - select#filter-categoria name="category"
+// - select#page-size name="size"
+// - input#search-produtos
+// - table#produtos-table
+//
+// Strategy:
+// - NEVER submit form automatically (avoid loops)
+// - On user change: navigate by updating querystring (section/products, category, size, page=0)
+// - Search: local only
 // =======================
 function setupProductsTableUI() {
-  const table = document.getElementById('produtos-table');
-  const tbody = document.getElementById('produtos-tbody') || table?.querySelector('tbody');
-  const searchInput = document.getElementById('search-produtos');
+  const filterForm = document.getElementById('products-filter-form');
   const categorySelect = document.getElementById('filter-categoria');
   const pageSizeSelect = document.getElementById('page-size');
-  const paginationEl = document.getElementById('table-pagination');
-  const emptyRow = document.getElementById('row-empty');
+  const pageInput = document.getElementById('page-input');
 
-  if (!table || !tbody || !paginationEl || !pageSizeSelect) return;
+  const searchInput = document.getElementById('search-produtos');
+  const table = document.getElementById('produtos-table');
+  const tbody = table?.querySelector('tbody');
 
-  let currentPage = 1;
-
-  function getAllDataRows() {
-    // só linhas com TD (ignora th:if "nenhum produto" ou algo estranho)
-    return Array.from(tbody.querySelectorAll('tr')).filter(r => r.querySelector('td'));
+  // Se não está na section products, sai
+  if (!filterForm || !categorySelect || !pageSizeSelect || !pageInput) {
+    // Mesmo assim, se tiver busca/tabela, não faz nada
+    return;
   }
 
-  function normalize(v) {
-    return (v || '').toString().trim().toLowerCase();
-  }
-
-  function normalizeUpper(v) {
-    return (v || '').toString().trim().toUpperCase();
-  }
-
-  function applyFiltersAndPaginate() {
-    const rows = getAllDataRows();
-
-    // filtros
-    const search = normalize(searchInput?.value);
-    const selectedCategory = normalizeUpper(categorySelect?.value);
-
-    // primeiro: marca quais passam no filtro
-    const filtered = rows.filter(row => {
-      // Nome (col 1) / Categoria (col 2)
-      const nome = normalize(row.cells[1]?.textContent);
-      const categoria = normalizeUpper(row.cells[2]?.textContent);
-
-      const matchSearch =
-        !search ||
-        (nome && nome.includes(search)) ||
-        (categoria && categoria.toLowerCase().includes(search));
-
-      const matchCategory =
-        !selectedCategory || selectedCategory === '' || categoria === selectedCategory;
-
-      return matchSearch && matchCategory;
-    });
-
-    // paginação
-    const pageSize = parseInt(pageSizeSelect.value, 10) || 10;
-    const totalItems = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-
-    // garante página válida
-    if (currentPage > totalPages) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
-
-    const start = (currentPage - 1) * pageSize;
-    const end = start + pageSize;
-
-    // esconde tudo
-    rows.forEach(r => (r.style.display = 'none'));
-
-    // mostra apenas o slice paginado
-    filtered.slice(start, end).forEach(r => (r.style.display = ''));
-
-    // linha "Nenhum produto"
-    if (emptyRow) {
-      emptyRow.style.display = totalItems === 0 ? '' : 'none';
-    }
-
-    renderPagination(totalPages);
-  }
-
-  function renderPagination(totalPages) {
-    paginationEl.innerHTML = '';
-
-    // se só 1 página, some
-    if (totalPages <= 1) return;
-
-    const mkBtn = (label, page, disabled = false, active = false) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'btn btn-outline btn-small';
-      b.textContent = label;
-
-      // leve destaque para o ativo
-      if (active) b.classList.add('btn-primary');
-
-      b.disabled = disabled;
-
-      b.addEventListener('click', () => {
-        currentPage = page;
-        applyFiltersAndPaginate();
-      });
-
-      return b;
-    };
-
-    // Prev
-    paginationEl.appendChild(
-      mkBtn('«', currentPage - 1, currentPage === 1)
-    );
-
-    // Janela de páginas (para não criar 100 botões)
-    const windowSize = 5;
-    let start = Math.max(1, currentPage - Math.floor(windowSize / 2));
-    let end = Math.min(totalPages, start + windowSize - 1);
-
-    if (end - start + 1 < windowSize) {
-      start = Math.max(1, end - windowSize + 1);
-    }
-
-    if (start > 1) {
-      paginationEl.appendChild(mkBtn('1', 1, false, currentPage === 1));
-      if (start > 2) {
-        const dots = document.createElement('span');
-        dots.textContent = '...';
-        dots.style.opacity = '.7';
-        dots.style.padding = '0 .25rem';
-        paginationEl.appendChild(dots);
-      }
-    }
-
-    for (let p = start; p <= end; p++) {
-      paginationEl.appendChild(mkBtn(String(p), p, false, p === currentPage));
-    }
-
-    if (end < totalPages) {
-      if (end < totalPages - 1) {
-        const dots = document.createElement('span');
-        dots.textContent = '...';
-        dots.style.opacity = '.7';
-        dots.style.padding = '0 .25rem';
-        paginationEl.appendChild(dots);
-      }
-      paginationEl.appendChild(
-        mkBtn(String(totalPages), totalPages, false, currentPage === totalPages)
-      );
-    }
-
-    // Next
-    paginationEl.appendChild(
-      mkBtn('»', currentPage + 1, currentPage === totalPages)
-    );
-  }
-
-  // eventos
-  if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      currentPage = 1;
-      applyFiltersAndPaginate();
-    });
-  }
-
-  if (categorySelect) {
-    categorySelect.addEventListener('change', () => {
-      currentPage = 1;
-      applyFiltersAndPaginate();
-    });
-  }
-
-  pageSizeSelect.addEventListener('change', () => {
-    currentPage = 1;
-    applyFiltersAndPaginate();
+  // Hard stop: nunca permitir submit automático do form por JS
+  // (se alguém apertar Enter dentro do form, prevenimos)
+  filterForm.addEventListener('submit', function (e) {
+    // Esse form é só "portador" de inputs; a navegação é via window.location.
+    e.preventDefault();
   });
 
-  // inicial
-  applyFiltersAndPaginate();
+  // Navega alterando a URL (GET /admin?...), sem form.submit
+  function navigateToProducts(params) {
+    const url = new URL(window.location.href);
+
+    // garante section
+    url.searchParams.set('section', 'products');
+
+    // aplica params
+    Object.keys(params).forEach((k) => {
+      const v = params[k];
+      if (v === null || v === undefined || v === '') {
+        url.searchParams.delete(k);
+      } else {
+        url.searchParams.set(k, String(v));
+      }
+    });
+
+    // evita navegação redundante (mesma URL)
+    if (url.toString() === window.location.href) return;
+
+    window.location.assign(url.toString());
+  }
+
+  // Dispara somente se for ação real do usuário
+  function onUserChange(evt, fn) {
+    if (!evt || evt.isTrusted !== true) return; // bloqueia changes automáticos do browser
+    fn();
+  }
+
+  categorySelect.addEventListener('change', (evt) => onUserChange(evt, () => {
+    const category = (categorySelect.value || '').trim();
+    const size = (pageSizeSelect.value || '').trim();
+    navigateToProducts({ category, size, page: 0 });
+  }));
+
+  pageSizeSelect.addEventListener('change', (evt) => onUserChange(evt, () => {
+    const category = (categorySelect.value || '').trim();
+    const size = (pageSizeSelect.value || '').trim();
+    navigateToProducts({ category, size, page: 0 });
+  }));
+
+  // Search local (somente página atual)
+  if (searchInput && tbody) {
+    const normalize = (v) => (v || '').toString().trim().toLowerCase();
+
+    const applySearch = () => {
+      const q = normalize(searchInput.value);
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+
+      rows.forEach((row) => {
+        // ignora linha "Nenhum produto cadastrado."
+        if (row.querySelector('td[colspan]')) return;
+        const text = normalize(row.innerText);
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    };
+
+    let t = null;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(applySearch, 120);
+    });
+  }
 }
 
 // =======================
@@ -247,7 +167,9 @@ function initMoneyInput() {
 
   if (!maskInput || !hiddenInput) return;
 
-  const initialValue = parseFloat((hiddenInput.value || '0').toString().replace(',', '.')) || 0;
+  const initialValue =
+    parseFloat((hiddenInput.value || '0').toString().replace(',', '.')) || 0;
+
   setMoneyValue(maskInput, hiddenInput, initialValue);
 
   maskInput.addEventListener('input', () => {
@@ -287,7 +209,7 @@ function initMoneyInput() {
 function setMoneyValue(maskInput, hiddenInput, value) {
   const v = Math.max(0, Number(value) || 0);
   maskInput.value = formatBRL(v);
-  hiddenInput.value = v.toFixed(2); // backend recebe com ponto
+  hiddenInput.value = v.toFixed(2);
 }
 
 function formatBRL(value) {
@@ -304,6 +226,8 @@ function bindProductFormActions() {
   const addBtn = document.getElementById('add-produto-btn');
   const cancelBtn = document.getElementById('produto-cancelar-btn');
 
+  // Observação: addBtn é <a href="/admin?section=products">, ele navega de qualquer jeito.
+  // Se você quer só limpar o form sem navegar, troque o <a> por <button type="button">.
   if (addBtn) addBtn.addEventListener('click', resetProductForm);
   if (cancelBtn) cancelBtn.addEventListener('click', resetProductForm);
 }
@@ -333,7 +257,9 @@ function syncPriceMaskFromHidden() {
   const hiddenInput = document.getElementById('produto-preco');
   if (!maskInput || !hiddenInput) return;
 
-  const numeric = parseFloat((hiddenInput.value || '0').toString().replace(',', '.')) || 0;
+  const numeric =
+    parseFloat((hiddenInput.value || '0').toString().replace(',', '.')) || 0;
+
   setMoneyValue(maskInput, hiddenInput, numeric);
 }
 
@@ -352,7 +278,7 @@ function setupDeleteModal() {
   const catEl = document.getElementById('delete-product-category');
   const priceEl = document.getElementById('delete-product-price');
 
-  document.querySelectorAll('.btn-delete').forEach(link => {
+  document.querySelectorAll('.btn-delete').forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
 

@@ -350,68 +350,118 @@
 				<div class="admin-divider"></div>
 
 				<div class="admin-filters">
-					<div class="filter-group">
-						<input type="text" id="search-produtos" placeholder="Buscar produtos..." class="admin-input">
+				  <div class="filter-group">
 
-						<select id="filter-categoria" class="admin-select">
-							<option value="" th:selected="${selectedCategory == ''}">Todas as categorias</option>
-							<option value="ELECTRONICS" th:selected="${selectedCategory == 'ELECTRONICS'}">Eletrônicos
-							</option>
-							<option value="CLOTHING" th:selected="${selectedCategory == 'CLOTHING'}">Roupas</option>
-							<option value="HOME" th:selected="${selectedCategory == 'HOME'}">Casa & Jardim</option>
-							<option value="SPORTS" th:selected="${selectedCategory == 'SPORTS'}">Esportes</option>
-						</select>
-					</div>
+				    <!-- search local (filtra apenas a página atual) -->
+				    <input type="text" id="search-produtos" placeholder="Buscar produtos..." class="admin-input">
+
+				    <!-- filtro server-side -->
+				    <form id="products-filter-form" th:action="@{/admin}" method="get" class="filter-inline-form">
+				      <input type="hidden" name="section" value="products"/>
+				      <input type="hidden" name="page" id="page-input" th:value="${productPage != null ? productPage.number : 0}"/>
+
+				      <select id="filter-categoria" name="category" class="admin-select">
+				        <option value="" th:selected="${selectedCategory == ''}">Todas as categorias</option>
+				        <option value="ELECTRONICS" th:selected="${selectedCategory == 'ELECTRONICS'}">Eletrônicos</option>
+				        <option value="CLOTHING" th:selected="${selectedCategory == 'CLOTHING'}">Roupas</option>
+				        <option value="HOME" th:selected="${selectedCategory == 'HOME'}">Casa & Jardim</option>
+				        <option value="SPORTS" th:selected="${selectedCategory == 'SPORTS'}">Esportes</option>
+				      </select>
+
+				      <select id="page-size" name="size" class="admin-select">
+				        <option value="5"  th:selected="${productPage != null and productPage.size == 5}">5</option>
+				        <option value="10" th:selected="${productPage == null or productPage.size == 10}">10</option>
+				        <option value="20" th:selected="${productPage != null and productPage.size == 20}">20</option>
+				        <option value="50" th:selected="${productPage != null and productPage.size == 50}">50</option>
+				      </select>
+				    </form>
+
+				  </div>
 				</div>
 
 				<div class="admin-table-container">
-					<table class="admin-table" id="produtos-table">
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Nome</th>
-								<th>Categoria</th>
-								<th>Preço</th>
-								<th>Estado</th>
-								<th>Ações</th>
-							</tr>
-						</thead>
+				  <table class="admin-table" id="produtos-table">
+				    <thead>
+				    <tr>
+				      <th>ID</th>
+				      <th>Nome</th>
+				      <th>Categoria</th>
+				      <th>Preço</th>
+				      <th>Estado</th>
+				      <th>Ações</th>
+				    </tr>
+				    </thead>
 
-						<tbody>
-							<tr th:each="p : ${products}"
-								th:attr="data-category=${#strings.toUpperCase(#strings.trim(p.category))}">
-								<td th:text="${p.id}">1</td>
-								<td th:text="${p.name}">Produto</td>
-								<td th:text="${p.category}">ELECTRONICS</td>
-								<td th:text="'R$ ' + ${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">R$ 0,00
-								</td>
-								<td>
-									<span class="badge" th:text="${#strings.toUpperCase(#strings.trim(p.state))}"
-										th:classappend="${#strings.toUpperCase(#strings.trim(p.state)) == 'ACTIVE'} ? ' badge--ACTIVE' : ' badge--INACTIVE'">
-									</span>
-								</td>
+				    <tbody>
+				    <tr th:each="p : ${products}"
+				        th:attr="data-category=${#strings.toUpperCase(#strings.trim(p.category))}">
+				      <td th:text="${p.id}">1</td>
+				      <td th:text="${p.name}">Produto</td>
+				      <td th:text="${p.category}">ELECTRONICS</td>
+				      <td th:text="'R$ ' + ${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
 
-								<td class="action-buttons">
-									<a th:href="@{/admin/product/edit/{id}(id=${p.id})}" class="btn-icon btn-edit"
-										title="Editar">
-										<i class="fas fa-edit"></i>
-									</a>
+				      <td>
+				        <span class="badge"
+				              th:text="${#strings.toUpperCase(#strings.trim(p.state))}"
+				              th:classappend="${#strings.toUpperCase(#strings.trim(p.state)) == 'ACTIVE'} ? ' badge--ACTIVE' : ' badge--INACTIVE'">
+				        </span>
+				      </td>
 
-									<!--  agora abre modal -->
-									<a th:href="@{/admin/product/delete/{id}(id=${p.id})}" class="btn-icon btn-delete"
-										title="Excluir"
-										th:attr="data-id=${p.id},data-name=${p.name},data-category=${p.category},data-price=${p.price}">
-										<i class="fas fa-trash"></i>
-									</a>
-								</td>
+				      <td class="action-buttons">
+				        <a th:href="@{/admin/product/edit/{id}(id=${p.id})}"
+				           class="btn-icon btn-edit" title="Editar">
+				          <i class="fas fa-edit"></i>
+				        </a>
 
-							</tr>
+				        <a th:href="@{/admin/product/delete/{id}(id=${p.id})}"
+				           class="btn-icon btn-delete" title="Excluir"
+				           th:attr="data-id=${p.id},data-name=${p.name},data-category=${p.category},data-price=${p.price}">
+				          <i class="fas fa-trash"></i>
+				        </a>
+				      </td>
+				    </tr>
 
-							<tr th:if="${#lists.isEmpty(products)}">
-								<td colspan="6">Nenhum produto cadastrado.</td>
-							</tr>
-						</tbody>
-					</table>
+				    <tr th:if="${#lists.isEmpty(products)}">
+				      <td colspan="6">Nenhum produto cadastrado.</td>
+				    </tr>
+				    </tbody>
+				  </table>
+				</div>
+
+				<!-- PAGINAÇÃO SEM BOOTSTRAP -->
+				<div class="pagination-wrap"
+				     th:if="${productPage != null and productPage.totalPages > 1}">
+
+				  <div class="pagination-info">
+				    <span th:text="'Página ' + (${productPage.number + 1}) + ' de ' + ${productPage.totalPages}">Página 1 de 1</span>
+				    <span class="pagination-total"
+				          th:text="' • Total: ' + ${productPage.totalElements}"> • Total: 0</span>
+				  </div>
+
+				  <nav class="pagination" aria-label="Paginação de produtos">
+				    <!-- Prev -->
+				    <a class="page-btn"
+				       th:classappend="${productPage.first} ? ' is-disabled'"
+				       th:href="@{/admin(section='products', category=${selectedCategory}, page=${productPage.number - 1}, size=${productPage.size})}">
+				      ‹
+				    </a>
+
+				    <!-- Pages -->
+				    <a class="page-btn"
+				       th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+				       th:text="${i + 1}"
+				       th:classappend="${i == productPage.number} ? ' is-active'"
+				       th:href="@{/admin(section='products', category=${selectedCategory}, page=${i}, size=${productPage.size})}">
+				      1
+				    </a>
+
+				    <!-- Next -->
+				    <a class="page-btn"
+				       th:classappend="${productPage.last} ? ' is-disabled'"
+				       th:href="@{/admin(section='products', category=${selectedCategory}, page=${productPage.number + 1}, size=${productPage.size})}">
+				      ›
+				    </a>
+				  </nav>
 				</div>
 			</section>
 
