@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.ecommerce.entity.Order;
+import com.ecommerce.entity.OrderShippingStatus;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.StatusUsuario;
 import com.ecommerce.entity.User;
@@ -65,14 +66,23 @@ public class AdminController {
 	@GetMapping("/admin")
 	public String admin(
 	        @RequestParam(name = "section", required = false, defaultValue = "dashboard") String section,
+
+	        // PRODUCTS FILTERS
 	        @RequestParam(name = "category", required = false) String category,
+	        @RequestParam(name = "pPage", required = false, defaultValue = "0") int pPage,
+	        @RequestParam(name = "pSize", required = false, defaultValue = "10") int pSize,
+
+	        // ORDERS FILTERS
+	        @RequestParam(name = "shippingStatus", required = false) String shippingStatus,
+	        @RequestParam(name = "paid", required = false) String paid,
+	        @RequestParam(name = "oPage", required = false, defaultValue = "0") int oPage,
+	        @RequestParam(name = "oSize", required = false, defaultValue = "10") int oSize,
+
+	        // USERS FILTER
 	        @RequestParam(name = "userStatus", required = false) String userStatus,
 
-	        // ===== PAGINAÇÃO PRODUTOS =====
-	        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-	        @RequestParam(name = "size", required = false, defaultValue = "10") int size,
-
-	        Model model) {
+	        Model model
+	) {
 
 	    String activeSection = normalizeSection(section);
 
@@ -82,46 +92,89 @@ public class AdminController {
 	    model.addAttribute("activeSection", activeSection);
 
 	    // =========================
-	    // PRODUCTS (PAGINADO + ordenado por id)
+	    // PRODUCTS (PAGINADO)
 	    // =========================
 	    String selectedCategory = (category == null) ? "" : category.trim().toUpperCase();
 	    model.addAttribute("selectedCategory", selectedCategory);
 
-	    int safePage = Math.max(page, 0);
-	    int safeSize = (size <= 0) ? 10 : size;
+	    int safePPage = Math.max(pPage, 0);
+	    int safePSize = (pSize <= 0) ? 10 : pSize;
 
-	    PageRequest pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "id"));
+	    PageRequest productsPageable = PageRequest.of(safePPage, safePSize, Sort.by(Sort.Direction.DESC, "id"));
 
-	    Page<Product> productPage;
-	    if (!selectedCategory.isEmpty()) {
-	        productPage = productRepository.findByCategoryIgnoreCase(selectedCategory, pageable);
-	    } else {
-	        productPage = productRepository.findAll(pageable);
-	    }
+	    Page<Product> productPage = selectedCategory.isEmpty()
+	            ? productRepository.findAll(productsPageable)
+	            : productRepository.findByCategoryIgnoreCase(selectedCategory, productsPageable);
 
 	    model.addAttribute("productPage", productPage);
 	    model.addAttribute("products", productPage.getContent());
 	    model.addAttribute("totalProducts", productPage.getTotalElements());
 
 	    // =========================
-	    // ORDERS
+	    // ORDERS (PAGINADO)
 	    // =========================
-	    List<Order> orders = orderRepository.findAll();
-	    model.addAttribute("orders", orders);
-	    model.addAttribute("totalOrders", orders.size());
+	    int safeOPage = Math.max(oPage, 0);
+	    int safeOSize = (oSize <= 0) ? 10 : oSize;
 
-	    BigDecimal totalSales = orders.stream()
-	            .filter(Order::isPaid)
-	            .map(o -> o.getTotalAmount() == null ? BigDecimal.ZERO : o.getTotalAmount())
-	            .reduce(BigDecimal.ZERO, BigDecimal::add);
+	    PageRequest ordersPageable = PageRequest.of(safeOPage, safeOSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-	    model.addAttribute("totalSales", totalSales);
+	    OrderShippingStatus parsedShipping = null;
+	    if (shippingStatus != null && !shippingStatus.trim().isEmpty()) {
+	        try {
+	            parsedShipping = OrderShippingStatus.valueOf(shippingStatus.trim().toUpperCase());
+	        } catch (Exception ignored) {
+	        }
+	    }
 
-	    var recentOrders = orderRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, 5));
-	    model.addAttribute("recentOrders", recentOrders);
+	    Boolean parsedPaid = null;
+	    if (paid != null && !paid.trim().isEmpty()) {
+	        if ("true".equalsIgnoreCase(paid) || "1".equals(paid) || "pago".equalsIgnoreCase(paid)) parsedPaid = true;
+	        if ("false".equalsIgnoreCase(paid) || "0".equals(paid) || "nao".equalsIgnoreCase(paid) || "não".equalsIgnoreCase(paid)) parsedPaid = false;
+	    }
 
-	    var topProducts = orderItemRepository.findTopSellingProducts(PageRequest.of(0, 5));
-	    model.addAttribute("topProducts", topProducts);
+	    Page<Order> orderPage;
+	    if (parsedShipping != null && parsedPaid != null) {
+	        orderPage = orderRepository.findByShippingStatusAndPaidOrderByCreatedAtDesc(parsedShipping, parsedPaid, ordersPageable);
+	    } else if (parsedShipping != null) {
+	        orderPage = orderRepository.findByShippingStatusOrderByCreatedAtDesc(parsedShipping, ordersPageable);
+	    } else if (parsedPaid != null) {
+	        orderPage = orderRepository.findByPaidOrderByCreatedAtDesc(parsedPaid, ordersPageable);
+	    } else {
+	        orderPage = orderRepository.findAllByOrderByCreatedAtDesc(ordersPageable);
+	    }
+
+	    model.addAttribute("orderPage", orderPage);
+	    model.addAttribute("orders", orderPage.getContent());
+
+	    model.addAttribute("selectedShippingStatus", parsedShipping == null ? "" : parsedShipping.name());
+	    model.addAttribute("selectedPaid", parsedPaid == null ? "" : String.valueOf(parsedPaid));
+
+	    model.addAttribute("totalOrders", orderPage.getTotalElements());
+
+	    // =========================
+	    // DASHBOARD METRICS (só se dashboard)
+	    // Evita fazer findAll() sempre (pesado)
+	    // =========================
+	    if ("dashboard".equals(activeSection)) {
+	        // se quiser manter simples, ok.
+	        // Ideal seria query agregada, mas por enquanto:
+	        List<Order> allOrders = orderRepository.findAll();
+	        BigDecimal totalSales = allOrders.stream()
+	                .filter(Order::isPaid)
+	                .map(o -> o.getTotalAmount() == null ? BigDecimal.ZERO : o.getTotalAmount())
+	                .reduce(BigDecimal.ZERO, BigDecimal::add);
+	        model.addAttribute("totalSales", totalSales);
+
+	        var recentOrders = orderRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, 5));
+	        model.addAttribute("recentOrders", recentOrders);
+
+	        var topProducts = orderItemRepository.findTopSellingProducts(PageRequest.of(0, 5));
+	        model.addAttribute("topProducts", topProducts);
+	    } else {
+	        model.addAttribute("totalSales", BigDecimal.ZERO);
+	        model.addAttribute("recentOrders", Collections.emptyList());
+	        model.addAttribute("topProducts", Collections.emptyList());
+	    }
 
 	    // TOTAL USERS (para o dashboard)
 	    model.addAttribute("totalUsers", (int) userRepository.count());
@@ -130,9 +183,7 @@ public class AdminController {
 	    model.addAttribute("formMode", "create");
 	    model.addAttribute("productForm", new Product());
 
-	    // =========================
-	    // USERS
-	    // =========================
+	    // USERS (mantém seu fluxo)
 	    model.addAttribute("statusUsuarioOptions", StatusUsuario.values());
 	    model.addAttribute("formModeUser", "create");
 	    model.addAttribute("userForm", new User());
@@ -141,12 +192,9 @@ public class AdminController {
 	        StatusUsuario parsedStatus = parseStatusUsuario(userStatus);
 	        model.addAttribute("selectedUserStatus", parsedStatus == null ? "" : parsedStatus.name());
 
-	        List<User> users;
-	        if (parsedStatus != null) {
-	            users = userRepository.findByStatusUsuario(parsedStatus, Sort.by(Sort.Direction.ASC, "id"));
-	        } else {
-	            users = userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
-	        }
+	        List<User> users = (parsedStatus != null)
+	                ? userRepository.findByStatusUsuario(parsedStatus, Sort.by(Sort.Direction.ASC, "id"))
+	                : userRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
 
 	        model.addAttribute("users", users);
 	    } else {
@@ -156,7 +204,6 @@ public class AdminController {
 
 	    return "admin";
 	}
-
 	// =========================
 	// PRODUCTS
 	// =========================

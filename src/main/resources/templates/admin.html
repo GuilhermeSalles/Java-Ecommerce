@@ -358,7 +358,8 @@
 				    <!-- filtro server-side -->
 				    <form id="products-filter-form" th:action="@{/admin}" method="get" class="filter-inline-form">
 				      <input type="hidden" name="section" value="products"/>
-				      <input type="hidden" name="page" id="page-input" th:value="${productPage != null ? productPage.number : 0}"/>
+					  <input type="hidden" name="pPage" id="page-input"
+					         th:value="${productPage != null ? productPage.number : 0}" />
 
 				      <select id="filter-categoria" name="category" class="admin-select">
 				        <option value="" th:selected="${selectedCategory == ''}">Todas as categorias</option>
@@ -368,12 +369,12 @@
 				        <option value="SPORTS" th:selected="${selectedCategory == 'SPORTS'}">Esportes</option>
 				      </select>
 
-				      <select id="page-size" name="size" class="admin-select">
-				        <option value="5"  th:selected="${productPage != null and productPage.size == 5}">5</option>
-				        <option value="10" th:selected="${productPage == null or productPage.size == 10}">10</option>
-				        <option value="20" th:selected="${productPage != null and productPage.size == 20}">20</option>
-				        <option value="50" th:selected="${productPage != null and productPage.size == 50}">50</option>
-				      </select>
+					  <select id="page-size" name="pSize" class="admin-select">
+					    <option value="5"  th:selected="${productPage != null and productPage.size == 5}">5</option>
+					    <option value="10" th:selected="${productPage == null or productPage.size == 10}">10</option>
+					    <option value="20" th:selected="${productPage != null and productPage.size == 20}">20</option>
+					    <option value="50" th:selected="${productPage != null and productPage.size == 50}">50</option>
+					  </select>
 				    </form>
 
 				  </div>
@@ -442,7 +443,10 @@
 				    <!-- Prev -->
 				    <a class="page-btn"
 				       th:classappend="${productPage.first} ? ' is-disabled'"
-				       th:href="@{/admin(section='products', category=${selectedCategory}, page=${productPage.number - 1}, size=${productPage.size})}">
+				       th:href="@{/admin(section='products',
+				                        category=${selectedCategory},
+				                        pPage=${productPage.number - 1},
+				                        pSize=${productPage.size})}">
 				      ‹
 				    </a>
 
@@ -451,14 +455,20 @@
 				       th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
 				       th:text="${i + 1}"
 				       th:classappend="${i == productPage.number} ? ' is-active'"
-				       th:href="@{/admin(section='products', category=${selectedCategory}, page=${i}, size=${productPage.size})}">
+				       th:href="@{/admin(section='products',
+				                        category=${selectedCategory},
+				                        pPage=${i},
+				                        pSize=${productPage.size})}">
 				      1
 				    </a>
 
 				    <!-- Next -->
 				    <a class="page-btn"
 				       th:classappend="${productPage.last} ? ' is-disabled'"
-				       th:href="@{/admin(section='products', category=${selectedCategory}, page=${productPage.number + 1}, size=${productPage.size})}">
+				       th:href="@{/admin(section='products',
+				                        category=${selectedCategory},
+				                        pPage=${productPage.number + 1},
+				                        pSize=${productPage.size})}">
 				      ›
 				    </a>
 				  </nav>
@@ -467,82 +477,164 @@
 
 			<!-- Orders -->
 			<section id="orders" class="admin-section" th:if="${activeSection == 'orders'}">
-				<div class="admin-header-section">
-					<div class="left">
-						<h2><i class="fas fa-shopping-cart"></i> Gestão de Pedidos</h2>
-						<p>Visualize e acompanhe os pedidos realizados na loja</p>
-					</div>
-				</div>
+			  <div class="admin-header-section">
+			    <div class="left">
+			      <h2><i class="fas fa-shopping-cart"></i> Gestão de Pedidos</h2>
+			      <p>Visualize e acompanhe os pedidos realizados na loja</p>
+			    </div>
+			  </div>
 
-				<div class="admin-card">
-					<div class="card-header">
-						<h3>Pedidos</h3>
-					</div>
+			  <div class="admin-card">
+			    <div class="card-header">
+			      <h3>Pedidos</h3>
+			    </div>
 
-					<div class="card-content">
-						<div class="admin-table-container" style="margin-top:1rem;">
-							<table class="admin-table" id="pedidos-table">
-								<thead>
-									<tr>
-										<th>ID</th>
-										<th>Cliente</th>
-										<th>Status</th>
-										<th>Pago</th>
-										<th>Valor</th>
-										<th>Data</th>
-									</tr>
-								</thead>
+			    <div class="card-content">
 
-								<tbody>
-									<tr th:each="o : ${orders}">
-										<td th:text="${o.id}">1</td>
+			      <!-- filtros server-side -->
+			      <div class="admin-filters">
+			        <div class="filter-group">
 
-										<td>
-											<div style="display:flex; flex-direction:column; gap:.15rem;">
-												<strong th:text="${o.customerName}">Cliente</strong>
-												<small style="opacity:.75"
-													th:text="${o.customerEmail}">email@exemplo.com</small>
-											</div>
-										</td>
+			          <!-- search local (filtra apenas a página atual) -->
+			          <input type="text" id="search-orders" placeholder="Buscar pedidos..." class="admin-input">
 
-										<td>
-											<span class="badge" th:text="${o.shippingStatus}" th:classappend="${o.shippingStatus == 'DELIVERED'} ? ' badge--success' :
-											                      (${o.shippingStatus == 'SHIPPED'} ? ' badge--warning' : ' badge--muted')">
-												PLACED
-											</span>
-										</td>
+			          <form id="orders-filter-form" th:action="@{/admin}" method="get" class="filter-inline-form">
+			            <input type="hidden" name="section" value="orders" />
+			            <input type="hidden" name="oPage" id="orders-page-input" th:value="${orderPage != null ? orderPage.number : 0}" />
 
-										<td>
-											<span class="badge" th:text="${o.paid} ? 'Pago' : 'Não pago'"
-												th:classappend="${o.paid} ? ' badge--success' : ' badge--muted'">
-												Pago
-											</span>
-										</td>
+			            <select id="filter-shipping" name="shippingStatus" class="admin-select">
+			              <option value="" th:selected="${selectedShippingStatus == ''}">Todos status</option>
+			              <option value="PLACED" th:selected="${selectedShippingStatus == 'PLACED'}">PLACED</option>
+			              <option value="SHIPPED" th:selected="${selectedShippingStatus == 'SHIPPED'}">SHIPPED</option>
+			              <option value="DELIVERED" th:selected="${selectedShippingStatus == 'DELIVERED'}">DELIVERED</option>
+			            </select>
 
-										<td
-											th:text="'R$ ' + ${#numbers.formatDecimal(o.totalAmount, 1, 'POINT', 2, 'COMMA')}">
-											R$ 0,00
-										</td>
+			            <select id="filter-paid" name="paid" class="admin-select">
+			              <option value="" th:selected="${selectedPaid == ''}">Pago (todos)</option>
+			              <option value="true" th:selected="${selectedPaid == 'true'}">Pago</option>
+			              <option value="false" th:selected="${selectedPaid == 'false'}">Não pago</option>
+			            </select>
 
-										<td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">
-											19/02/2026 10:00
-										</td>
-									</tr>
+			            <select id="orders-page-size" name="oSize" class="admin-select">
+			              <option value="5"  th:selected="${orderPage != null and orderPage.size == 5}">5</option>
+			              <option value="10" th:selected="${orderPage == null or orderPage.size == 10}">10</option>
+			              <option value="20" th:selected="${orderPage != null and orderPage.size == 20}">20</option>
+			              <option value="50" th:selected="${orderPage != null and orderPage.size == 50}">50</option>
+			            </select>
+			          </form>
 
-									<tr th:if="${#lists.isEmpty(orders)}">
-										<td colspan="6" style="text-align:center;">
-											Nenhum pedido para exibir.
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
+			        </div>
+			      </div>
 
-						<p style="opacity:.75; margin-top: .75rem;">
-							* Em breve: ações (detalhes/cancelar) e filtros por status.
-						</p>
-					</div>
-				</div>
+			      <div class="admin-table-container" style="margin-top:1rem;">
+			        <table class="admin-table" id="pedidos-table">
+			          <thead>
+			          <tr>
+			            <th>ID</th>
+			            <th>Cliente</th>
+			            <th>Status</th>
+			            <th>Pago</th>
+			            <th>Valor</th>
+			            <th>Data</th>
+			          </tr>
+			          </thead>
+
+			          <tbody>
+			          <tr th:each="o : ${orders}">
+			            <td th:text="${o.id}">1</td>
+
+			            <td>
+			              <div style="display:flex; flex-direction:column; gap:.15rem;">
+			                <strong th:text="${o.customerName}">Cliente</strong>
+			                <small style="opacity:.75" th:text="${o.customerEmail}">email@exemplo.com</small>
+			              </div>
+			            </td>
+
+			            <td>
+			              <span class="badge"
+			                    th:text="${o.shippingStatus}"
+			                    th:classappend="${o.shippingStatus == 'DELIVERED'} ? ' badge--success' :
+			                                   (${o.shippingStatus == 'SHIPPED'} ? ' badge--warning' : ' badge--muted')">
+			                PLACED
+			              </span>
+			            </td>
+
+			            <td>
+			              <span class="badge"
+			                    th:text="${o.paid} ? 'Pago' : 'Não pago'"
+			                    th:classappend="${o.paid} ? ' badge--success' : ' badge--muted'">
+			                Pago
+			              </span>
+			            </td>
+
+			            <td th:text="'R$ ' + ${#numbers.formatDecimal(o.totalAmount, 1, 'POINT', 2, 'COMMA')}">
+			              R$ 0,00
+			            </td>
+
+			            <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">
+			              19/02/2026 10:00
+			            </td>
+			          </tr>
+
+			          <tr th:if="${#lists.isEmpty(orders)}">
+			            <td colspan="6" style="text-align:center;">
+			              Nenhum pedido para exibir.
+			            </td>
+			          </tr>
+			          </tbody>
+			        </table>
+			      </div>
+
+			      <!-- paginação server-side -->
+			      <div class="pagination-wrap"
+			           th:if="${orderPage != null}">
+
+			        <div class="pagination-info">
+			          <span th:text="'Página ' + (${orderPage.number + 1}) + ' de ' + ${orderPage.totalPages}">Página 1 de 1</span>
+			          <span class="pagination-total"
+			                th:text="' • Total: ' + ${orderPage.totalElements}"> • Total: 0</span>
+			        </div>
+
+			        <nav class="pagination" aria-label="Paginação de pedidos">
+			          <a class="page-btn"
+			             th:classappend="${orderPage.first} ? ' is-disabled'"
+			             th:href="@{/admin(section='orders',
+			                              shippingStatus=${selectedShippingStatus},
+			                              paid=${selectedPaid},
+			                              oPage=${orderPage.number - 1},
+			                              oSize=${orderPage.size})}">
+			            ‹
+			          </a>
+
+			          <a class="page-btn"
+			             th:each="i : ${#numbers.sequence(0, orderPage.totalPages - 1)}"
+			             th:text="${i + 1}"
+			             th:classappend="${i == orderPage.number} ? ' is-active'"
+			             th:href="@{/admin(section='orders',
+			                              shippingStatus=${selectedShippingStatus},
+			                              paid=${selectedPaid},
+			                              oPage=${i},
+			                              oSize=${orderPage.size})}">
+			            1
+			          </a>
+
+			          <a class="page-btn"
+			             th:classappend="${orderPage.last} ? ' is-disabled'"
+			             th:href="@{/admin(section='orders',
+			                              shippingStatus=${selectedShippingStatus},
+			                              paid=${selectedPaid},
+			                              oPage=${orderPage.number + 1},
+			                              oSize=${orderPage.size})}">
+			            ›
+			          </a>
+			        </nav>
+			      </div>
+
+			      <p style="opacity:.75; margin-top: .75rem;">
+			        * Em breve: ações (detalhes/cancelar) e filtros por status.
+			      </p>
+			    </div>
+			  </div>
 			</section>
 
 			<!-- Users -->

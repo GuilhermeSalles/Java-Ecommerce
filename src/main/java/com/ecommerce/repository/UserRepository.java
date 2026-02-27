@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.ecommerce.entity.StatusUsuario;
 import com.ecommerce.entity.User;
@@ -16,6 +17,8 @@ import com.ecommerce.entity.User;
  * @author guilherme.sales
  * @since 26/02/2026
  */
+
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByEmail(String email);

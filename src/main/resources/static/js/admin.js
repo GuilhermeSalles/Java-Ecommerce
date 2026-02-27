@@ -1,19 +1,17 @@
 // ====================================
 // ADMIN (HARDENED - NO INFINITE RELOAD)
 // - Theme toggle
-// - Products: local search + server-side nav (category/size -> page=0) WITHOUT form.submit
+// - Products: local search + server-side nav (pPage/pSize) WITHOUT form.submit
+// - Orders: local search + server-side nav (oPage/oSize) WITHOUT form.submit
 // - Money input mask + validation (> 0)
 // - Reset form on "Adicionar Produto" / "Cancelar"
 // - Delete modal (products)
 // ====================================
 
 document.addEventListener('DOMContentLoaded', function () {
-  // --- DEBUG: se isso aparecer duas vezes no console, seu JS está sendo carregado 2x ---
-  // Descomente pra testar:
-  // console.log('[admin.js] loaded', new Date().toISOString());
-
   setupThemeToggle();
-  setupProductsTableUI(); // Pageable server-side (link navigation)
+  setupProductsTableUI();
+  setupOrdersTableUI();
   initMoneyInput();
   bindProductFormActions();
   syncPriceMaskFromHidden();
@@ -54,18 +52,13 @@ function updateThemeIcon(theme) {
 
 // =======================
 // PRODUCTS TABLE UI (SERVER-SIDE PAGEABLE)
-// HTML you have (confirmed):
-// - form#products-filter-form (GET /admin)
-// - input#page-input name="page"
-// - select#filter-categoria name="category"
-// - select#page-size name="size"
+// EXPECTED HTML:
+// - form#products-filter-form
+// - input#page-input  (hidden name="pPage")
+// - select#filter-categoria (name="category")
+// - select#page-size (name="pSize")
 // - input#search-produtos
 // - table#produtos-table
-//
-// Strategy:
-// - NEVER submit form automatically (avoid loops)
-// - On user change: navigate by updating querystring (section/products, category, size, page=0)
-// - Search: local only
 // =======================
 function setupProductsTableUI() {
   const filterForm = document.getElementById('products-filter-form');
@@ -77,88 +70,142 @@ function setupProductsTableUI() {
   const table = document.getElementById('produtos-table');
   const tbody = table?.querySelector('tbody');
 
-  // Se não está na section products, sai
-  if (!filterForm || !categorySelect || !pageSizeSelect || !pageInput) {
-    // Mesmo assim, se tiver busca/tabela, não faz nada
-    return;
-  }
+  if (!filterForm || !categorySelect || !pageSizeSelect || !pageInput) return;
 
-  // Hard stop: nunca permitir submit automático do form por JS
-  // (se alguém apertar Enter dentro do form, prevenimos)
-  filterForm.addEventListener('submit', function (e) {
-    // Esse form é só "portador" de inputs; a navegação é via window.location.
-    e.preventDefault();
-  });
+  // Nunca submeter automaticamente
+  filterForm.addEventListener('submit', (e) => e.preventDefault());
 
-  // Navega alterando a URL (GET /admin?...), sem form.submit
-  function navigateToProducts(params) {
+  function navigateProducts() {
     const url = new URL(window.location.href);
-
-    // garante section
     url.searchParams.set('section', 'products');
 
-    // aplica params
-    Object.keys(params).forEach((k) => {
-      const v = params[k];
-      if (v === null || v === undefined || v === '') {
-        url.searchParams.delete(k);
-      } else {
-        url.searchParams.set(k, String(v));
-      }
-    });
+    const category = (categorySelect.value || '').trim();
+    const pSize = (pageSizeSelect.value || '').trim();
 
-    // evita navegação redundante (mesma URL)
-    if (url.toString() === window.location.href) return;
+    if (category) url.searchParams.set('category', category);
+    else url.searchParams.delete('category');
 
-    window.location.assign(url.toString());
+    if (pSize) url.searchParams.set('pSize', pSize);
+    else url.searchParams.delete('pSize');
+
+    url.searchParams.set('pPage', '0');
+
+    if (url.toString() !== window.location.href) {
+      window.location.assign(url.toString());
+    }
   }
 
-  // Dispara somente se for ação real do usuário
-  function onUserChange(evt, fn) {
-    if (!evt || evt.isTrusted !== true) return; // bloqueia changes automáticos do browser
+  const onlyUser = (evt, fn) => {
+    if (!evt || evt.isTrusted !== true) return;
     fn();
-  }
+  };
 
-  categorySelect.addEventListener('change', (evt) => onUserChange(evt, () => {
-    const category = (categorySelect.value || '').trim();
-    const size = (pageSizeSelect.value || '').trim();
-    navigateToProducts({ category, size, page: 0 });
-  }));
-
-  pageSizeSelect.addEventListener('change', (evt) => onUserChange(evt, () => {
-    const category = (categorySelect.value || '').trim();
-    const size = (pageSizeSelect.value || '').trim();
-    navigateToProducts({ category, size, page: 0 });
-  }));
+  categorySelect.addEventListener('change', (e) => onlyUser(e, navigateProducts));
+  pageSizeSelect.addEventListener('change', (e) => onlyUser(e, navigateProducts));
 
   // Search local (somente página atual)
   if (searchInput && tbody) {
     const normalize = (v) => (v || '').toString().trim().toLowerCase();
 
-    const applySearch = () => {
-      const q = normalize(searchInput.value);
-      const rows = Array.from(tbody.querySelectorAll('tr'));
+    let t = null;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        const q = normalize(searchInput.value);
+        const rows = Array.from(tbody.querySelectorAll('tr'));
 
-      rows.forEach((row) => {
-        // ignora linha "Nenhum produto cadastrado."
-        if (row.querySelector('td[colspan]')) return;
-        const text = normalize(row.innerText);
-        row.style.display = text.includes(q) ? '' : 'none';
-      });
-    };
+        rows.forEach((row) => {
+          if (row.querySelector('td[colspan]')) return;
+          const text = normalize(row.innerText);
+          row.style.display = text.includes(q) ? '' : 'none';
+        });
+      }, 120);
+    });
+  }
+}
+
+// =======================
+// ORDERS TABLE UI (SERVER-SIDE PAGEABLE)
+// EXPECTED HTML:
+// - form#orders-filter-form
+// - input#orders-page-input (hidden name="oPage")
+// - select#filter-shipping (name="shippingStatus")
+// - select#filter-paid (name="paid")
+// - select#orders-page-size (name="oSize")
+// - input#search-orders
+// - table#pedidos-table
+// =======================
+function setupOrdersTableUI() {
+  const filterForm = document.getElementById('orders-filter-form');
+  const shippingSelect = document.getElementById('filter-shipping');
+  const paidSelect = document.getElementById('filter-paid');
+  const sizeSelect = document.getElementById('orders-page-size');
+  const pageInput = document.getElementById('orders-page-input');
+
+  const searchInput = document.getElementById('search-orders');
+  const table = document.getElementById('pedidos-table');
+  const tbody = table?.querySelector('tbody');
+
+  if (!filterForm || !shippingSelect || !paidSelect || !sizeSelect || !pageInput) return;
+
+  filterForm.addEventListener('submit', (e) => e.preventDefault());
+
+  function navigateOrders() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('section', 'orders');
+
+    const shipping = (shippingSelect.value || '').trim();
+    const paid = (paidSelect.value || '').trim();
+    const oSize = (sizeSelect.value || '').trim();
+
+    if (shipping) url.searchParams.set('shippingStatus', shipping);
+    else url.searchParams.delete('shippingStatus');
+
+    if (paid !== '') url.searchParams.set('paid', paid);
+    else url.searchParams.delete('paid');
+
+    if (oSize) url.searchParams.set('oSize', oSize);
+    else url.searchParams.delete('oSize');
+
+    url.searchParams.set('oPage', '0');
+
+    if (url.toString() !== window.location.href) {
+      window.location.assign(url.toString());
+    }
+  }
+
+  const onlyUser = (evt, fn) => {
+    if (!evt || evt.isTrusted !== true) return;
+    fn();
+  };
+
+  shippingSelect.addEventListener('change', (e) => onlyUser(e, navigateOrders));
+  paidSelect.addEventListener('change', (e) => onlyUser(e, navigateOrders));
+  sizeSelect.addEventListener('change', (e) => onlyUser(e, navigateOrders));
+
+  // Search local (somente página atual)
+  if (searchInput && tbody) {
+    const normalize = (v) => (v || '').toString().trim().toLowerCase();
 
     let t = null;
     searchInput.addEventListener('input', () => {
       clearTimeout(t);
-      t = setTimeout(applySearch, 120);
+      t = setTimeout(() => {
+        const q = normalize(searchInput.value);
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.forEach((row) => {
+          if (row.querySelector('td[colspan]')) return;
+          const text = normalize(row.innerText);
+          row.style.display = text.includes(q) ? '' : 'none';
+        });
+      }, 120);
     });
   }
 }
 
 // =======================
 // MONEY INPUT (Product Price)
-// - visible mask: #produto-preco-mask
-// - hidden to backend: #produto-preco (name="price")
 // =======================
 function initMoneyInput() {
   const maskInput = document.getElementById('produto-preco-mask');
@@ -226,8 +273,6 @@ function bindProductFormActions() {
   const addBtn = document.getElementById('add-produto-btn');
   const cancelBtn = document.getElementById('produto-cancelar-btn');
 
-  // Observação: addBtn é <a href="/admin?section=products">, ele navega de qualquer jeito.
-  // Se você quer só limpar o form sem navegar, troque o <a> por <button type="button">.
   if (addBtn) addBtn.addEventListener('click', resetProductForm);
   if (cancelBtn) cancelBtn.addEventListener('click', resetProductForm);
 }
