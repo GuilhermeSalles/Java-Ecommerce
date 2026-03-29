@@ -14,6 +14,7 @@
 O **Baltazar Store** foi desenvolvido para demonstrar a aplicação de padrões arquiteturais de alto nível e práticas modernas de desenvolvimento Java. O projeto resolve a complexidade de gerenciar um fluxo de vendas completo, desde o catálogo de produtos até o checkout e gestão administrativa.
 
 ### ✨ Principais Diferenciais
+
 - **Segurança Avançada**: Autenticação e autorização robustas com Spring Security e criptografia BCrypt.
 - **Painel Administrativo**: Gestão completa de produtos, pedidos e usuários com métricas em tempo real.
 - **Arquitetura Limpa**: Separação clara de responsabilidades seguindo o padrão MVC e princípios SOLID.
@@ -42,6 +43,7 @@ src/main/resources/
 ```
 
 ### Por que essa estrutura?
+
 - **Isolamento de Domínio**: As entidades e regras de negócio estão separadas da lógica de transporte (Controllers).
 - **Escalabilidade**: A camada de `repository` com `projections` permite consultas complexas sem sobrecarregar o banco de dados.
 - **Manutenibilidade**: Localização intuitiva de arquivos, facilitando a onboard de novos desenvolvedores.
@@ -53,6 +55,7 @@ src/main/resources/
 Este projeto utiliza o padrão **MVC (Model-View-Controller)**, escolhido por sua maturidade e suporte nativo no ecossistema Spring, garantindo um desacoplamento eficiente entre a interface e a lógica de negócio.
 
 ### Padrões Aplicados:
+
 - **SOLID**: Interfaces bem definidas e responsabilidade única em cada classe.
 - **TDD Ready**: Estrutura preparada para testes automatizados de unidade e integração.
 - **Diferencial**: Migração transparente entre **H2** (desenvolvimento rápido) e **PostgreSQL** (produção) via perfis do Spring.
@@ -73,6 +76,7 @@ Este projeto utiliza o padrão **MVC (Model-View-Controller)**, escolhido por su
 ## 🚀 Como Iniciar
 
 ### Pré-requisitos
+
 - Docker e Docker Compose instalados.
 - Java 21 (opcional se usar Docker).
 
@@ -88,25 +92,15 @@ cd Java-Ecommerce
 # 3. Suba os containers (Aplicação + Banco)
 docker-compose up --build
 ```
+
 Acesse em: `http://localhost:8080`
-
----
-
-## 🤝 Contribuindo
-
-Contribuições são fundamentais para a evolução deste projeto!
-
-1. Faça um **Fork** do projeto.
-2. Crie uma **Branch** para sua Feature (`git checkout -b feature/MinhaFeature`).
-3. Faça o **Commit** das suas mudanças (`git commit -m 'feat: Adiciona nova funcionalidade'`).
-4. Faça o **Push** da Branch (`git push origin feature/MinhaFeature`).
-5. Abra um **Pull Request**.
 
 ---
 
 ## 👤 Autor
 
 **Guilherme Baltazar Vericimo de Sales**
+
 - **LinkedIn**: [Conecte-se comigo](https://www.linkedin.com/in/guilherme-baltazar-0028361a1)
 - **Instagram**: [@yguilhermeb](https://instagram.com/yguilhermeb)
 - **GitHub**: [@GuilhermeSalles](https://github.com/GuilhermeSalles)
