@@ -1,126 +1,118 @@
-# 🛒 Ecommerce - Baltazar Store
+# 🛒 Baltazar Store - Ecommerce Moderno
 
-> Projeto de e-commerce moderno, seguro e escalável, desenvolvido com Spring Boot, Java 21, Thymeleaf, PostgreSQL (via Docker) e seguindo as melhores práticas de arquitetura e desenvolvimento.
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.2-brightgreen)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-21-orange)](https://www.oracle.com/java/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
----
-
-## 🏛️ Estrutura de Código e Princípios
-
-- **MVC (Model-View-Controller):** Toda a estrutura do projeto segue o padrão MVC, separando claramente responsabilidades entre entidades (model), controllers (lógica de fluxo e endpoints), views (Thymeleaf) e repositórios (persistência).
-- **SOLID:** Os princípios SOLID são aplicados na modelagem das entidades, controllers e repositórios, promovendo baixo acoplamento, alta coesão e facilidade de manutenção/extensão.
-- **TDD (Test-Driven Development):** O projeto está preparado para TDD, com estrutura de testes automatizados utilizando Spring Boot Test, facilitando a escrita de testes antes ou durante o desenvolvimento de novas funcionalidades.
-
-## 🚀 Visão Geral
-
-Este projeto é uma plataforma de e-commerce full-stack, com painel administrativo, autenticação segura, gestão de produtos, pedidos e usuários, interface responsiva e integração com banco de dados relacional. O objetivo é demonstrar domínio de arquitetura limpa, segurança, boas práticas de código e uso de tecnologias modernas.
+> Uma plataforma de e-commerce completa, segura e escalável, projetada para oferecer uma experiência de compra moderna e um painel administrativo robusto.
 
 ---
 
-## 🏗️ Arquitetura & Tecnologias
+## 🎯 Objetivo
 
-- **Backend:** Spring Boot 4, Java 21, Spring Security, Spring Data JPA
-- **Frontend:** Thymeleaf, HTML5, CSS3 (custom + FontAwesome), JavaScript
-- **Banco de Dados:**
-  - Inicialmente: H2 (memória, para prototipação rápida)
-  - Atualmente: PostgreSQL 16, orquestrado via Docker Compose
-- **Build & Deploy:** Maven Wrapper, Dockerfile multi-stage
-- **Testes:** Spring Boot Test, validação de entidades e controllers
-- **Outros:**
-  - BCrypt para hash de senhas
-  - Enum para status e permissões
-  - Responsividade e acessibilidade
+O **Baltazar Store** foi desenvolvido para demonstrar a aplicação de padrões arquiteturais de alto nível e práticas modernas de desenvolvimento Java. O projeto resolve a complexidade de gerenciar um fluxo de vendas completo, desde o catálogo de produtos até o checkout e gestão administrativa.
 
----
-
-## 🐳 Como rodar localmente (Docker)
-
-1. **Pré-requisitos:** Docker e Docker Compose instalados
-2. Clone o repositório:
-   ```bash
-   git clone https://github.com/GuilhermeSalles/Java-Ecommerce.git
-   cd Java-Ecommerce
-   ```
-3. Suba os containers:
-   ```bash
-   docker-compose up --build
-   ```
-4. Acesse em: [http://localhost:8080](http://localhost:8080)
-
----
-
-## 📝 Funcionalidades
-
-- Cadastro e login de usuários (com hash seguro de senha)
-- Painel administrativo completo (produtos, pedidos, usuários)
-- CRUD de produtos e usuários
-- Gestão de pedidos, status de envio e pagamento
-- Dashboard com métricas (vendas, usuários, produtos mais vendidos)
-- Filtros, buscas e formulários validados
-- Interface responsiva e moderna
-- Controle de permissões (ADMIN/USUARIO)
-- Logout seguro, CSRF, Remember-me
+### ✨ Principais Diferenciais
+- **Segurança Avançada**: Autenticação e autorização robustas com Spring Security e criptografia BCrypt.
+- **Painel Administrativo**: Gestão completa de produtos, pedidos e usuários com métricas em tempo real.
+- **Arquitetura Limpa**: Separação clara de responsabilidades seguindo o padrão MVC e princípios SOLID.
+- **Pronto para Produção**: Orquestração via Docker para ambientes de desenvolvimento e deploy consistentes.
 
 ---
 
 ## 📦 Estrutura do Projeto
 
+A organização de pastas segue as convenções do Spring Boot, otimizada para legibilidade e manutenção:
+
+```text
+src/main/java/com/ecommerce/
+├── config/             # Configurações globais (Segurança, Beans)
+├── controller/         # Pontos de entrada da aplicação (Web/API)
+│   └── dto/            # Objetos de Transferência de Dados
+├── entity/             # Modelo de dados e mapeamento JPA
+├── repository/         # Camada de persistência (Spring Data JPA)
+│   └── projection/     # Consultas customizadas e views otimizadas
+├── security/           # Lógica customizada de autenticação
+└── service/            # Regras de negócio e serviços internos
+
+src/main/resources/
+├── static/             # Ativos front-end (CSS, JS, Imagens)
+└── templates/          # Páginas renderizadas via Thymeleaf
 ```
-src/
-	main/
-		java/com/ecommerce/
-			config/         # Configurações de segurança e beans
-			controller/     # Controllers MVC (Admin, Home, Auth)
-			entity/         # Entidades JPA (User, Product, Order...)
-			repository/     # Repositórios Spring Data
-			service/        # (Pronto para lógica de negócio extra)
-		resources/
-			templates/      # Templates Thymeleaf (admin, index, auth...)
-			static/         # CSS, JS, imagens
-			application.properties
-	test/
-		java/com/ecommerce/ # Testes automatizados
+
+### Por que essa estrutura?
+- **Isolamento de Domínio**: As entidades e regras de negócio estão separadas da lógica de transporte (Controllers).
+- **Escalabilidade**: A camada de `repository` com `projections` permite consultas complexas sem sobrecarregar o banco de dados.
+- **Manutenibilidade**: Localização intuitiva de arquivos, facilitando a onboard de novos desenvolvedores.
+
+---
+
+## 🏗️ Arquitetura e Padrões
+
+Este projeto utiliza o padrão **MVC (Model-View-Controller)**, escolhido por sua maturidade e suporte nativo no ecossistema Spring, garantindo um desacoplamento eficiente entre a interface e a lógica de negócio.
+
+### Padrões Aplicados:
+- **SOLID**: Interfaces bem definidas e responsabilidade única em cada classe.
+- **TDD Ready**: Estrutura preparada para testes automatizados de unidade e integração.
+- **Diferencial**: Migração transparente entre **H2** (desenvolvimento rápido) e **PostgreSQL** (produção) via perfis do Spring.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Backend**: Java 21 & Spring Boot 4.0.2
+- **Segurança**: Spring Security & BCrypt
+- **Persistência**: Spring Data JPA & PostgreSQL
+- **Frontend**: Thymeleaf, HTML5, CSS3, JavaScript
+- **Infraestrutura**: Docker & Docker Compose
+- **Build**: Maven
+
+---
+
+## 🚀 Como Iniciar
+
+### Pré-requisitos
+- Docker e Docker Compose instalados.
+- Java 21 (opcional se usar Docker).
+
+### Instalação e Execução via Docker (Recomendado)
+
+```bash
+# 1. Clone o repositório
+git clone https://github.com/GuilhermeSalles/Java-Ecommerce.git
+
+# 2. Entre na pasta
+cd Java-Ecommerce
+
+# 3. Suba os containers (Aplicação + Banco)
+docker-compose up --build
 ```
+Acesse em: `http://localhost:8080`
 
 ---
 
-## 🛡️ Boas Práticas Adotadas
+## 🤝 Contribuindo
 
-- **Arquitetura MVC**: Separação clara entre controller, serviço, entidade e repositório
-- **Segurança**: Spring Security, BCrypt, CSRF, validação de entrada, enum para roles/status
-- **Clean Code**: Métodos pequenos, nomes claros, comentários úteis, enums para estados
-- **Responsividade**: CSS customizado, mobile-first, acessibilidade
-- **Testabilidade**: Dependências injetadas, uso de interfaces, testes automatizados
-- **Escalabilidade**: Pronto para camadas de serviço, fácil extensão de entidades e controllers
-- **Versionamento**: Uso de Maven Wrapper, Dockerfile multi-stage, Docker Compose
-- **Documentação**: README detalhado, comentários no código, exemplos de uso
+Contribuições são fundamentais para a evolução deste projeto!
 
----
-
-## 📝 Histórico de Commits (Principais)
-
-- **feat:** Implementação de autenticação, painel admin, CRUD, dashboard, integração com PostgreSQL via Docker
-- **fix:** Correções de dependências, melhorias de estrutura, ajustes de templates
-- **refactor:** Melhoria de HTML, integração de Thymeleaf, organização de código
-- **infra:** Adição de Dockerfile, docker-compose.yml, configuração de ambiente
+1. Faça um **Fork** do projeto.
+2. Crie uma **Branch** para sua Feature (`git checkout -b feature/MinhaFeature`).
+3. Faça o **Commit** das suas mudanças (`git commit -m 'feat: Adiciona nova funcionalidade'`).
+4. Faça o **Push** da Branch (`git push origin feature/MinhaFeature`).
+5. Abra um **Pull Request**.
 
 ---
 
-## 💡 Diferenciais Técnicos
+## 👤 Autor
 
-- Uso de **Docker Compose** para ambiente de desenvolvimento consistente
-- **Migração de H2 para PostgreSQL** para simular ambiente real
-- **Painel Admin** completo, com métricas e filtros
-- **Enum** para status, permissões e estados, facilitando manutenção
-- **Validação** de dados e feedbacks claros ao usuário
-- **Design moderno** e responsivo, pronto para produção
-- **Código limpo** e pronto para extensão (serviços, integrações, testes)
-
----
-
-## 👨‍💻 Sobre o Autor
-
-## 👤 Autor Java Full Stack Developer
 **Guilherme Baltazar Vericimo de Sales**
+- **LinkedIn**: [Conecte-se comigo](https://www.linkedin.com/in/guilherme-baltazar-0028361a1)
+- **Instagram**: [@yguilhermeb](https://instagram.com/yguilhermeb)
+- **GitHub**: [@GuilhermeSalles](https://github.com/GuilhermeSalles)
 
-<a href="https://www.linkedin.com/in/guilherme-baltazar-0028361a1" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
-<a href="https://instagram.com/yguilhermeb" target="_blank"><img src="https://img.shields.io/badge/-Instagram-%23E4405F?style=for-the-badge&logo=instagram&logoColor=white" target="_blank"></a>
+---
+
+## 📜 Licença
+
+Este projeto está sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
